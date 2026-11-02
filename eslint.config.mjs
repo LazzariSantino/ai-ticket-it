@@ -1,23 +1,16 @@
 import js from "@eslint/js";
 import globals from "globals";
-import pluginReact from "eslint-plugin-react";
 import { defineConfig } from "eslint/config";
 
+// La app mobile está en TypeScript y se valida con `npm run typecheck --workspace=mobile`
 export default defineConfig([
   {
-    ignores: ["**/node_modules/**", "**/.expo/**", "**/coverage/**"],
+    ignores: ["**/node_modules/**", "**/.expo/**", "**/coverage/**", "packages/mobile/**"],
   },
   {
     files: ["packages/backend/**/*.js"],
     plugins: { js },
     extends: ["js/recommended"],
     languageOptions: { globals: { ...globals.node, ...globals.jest } },
-  },
-  {
-    files: ["packages/mobile/**/*.{js,jsx}"],
-    ...pluginReact.configs.flat.recommended,
-    languageOptions: { globals: globals.browser },
-    settings: { react: { version: "detect" } },
-    rules: { "react/react-in-jsx-scope": "off", "react/prop-types": "off" },
   },
 ]);
