@@ -16,6 +16,10 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Label>Explorar</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="compras">
+        <NativeTabs.Trigger.Label>Mis compras</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="ticket" md="confirmation_number" />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="perfil">
         <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="person.crop.circle" md="person" />
