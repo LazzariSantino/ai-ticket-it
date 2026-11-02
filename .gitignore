@@ -1,0 +1,15 @@
+node_modules/
+/packages/**/node_modules/
+.env
+coverage/
+
+# Expo
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+expo-env.d.ts
