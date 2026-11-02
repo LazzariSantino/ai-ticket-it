@@ -73,6 +73,18 @@ export class CompraService {
     return await this._compraRepository.guardar(compra);
   }
 
+  async listarMensajes(usuario, compraId) {
+    const compra = await this.obtenerCompra(usuario, compraId);
+    return compra.mensajes;
+  }
+
+  async enviarMensaje(usuario, compraId, texto) {
+    const compra = await this.obtenerCompra(usuario, compraId);
+    const mensaje = compra.enviarMensaje(usuario, texto, this._reloj());
+    await this._compraRepository.guardar(compra);
+    return mensaje;
+  }
+
   _validarEstado(estado) {
     if (estado !== undefined && !esEstadoCompraValido(estado)) {
       throw new ValidationError(`El estado ${estado} no existe. Opciones: ${Object.values(EstadoCompra).join(", ")}`);

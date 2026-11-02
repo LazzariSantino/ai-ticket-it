@@ -11,6 +11,8 @@ export function crearCompraRouter(compraController, autenticar) {
   router.post("/:id/pago", (req, res) => compraController.pagar(req, res));
   router.post("/:id/cancelacion", (req, res) => compraController.cancelar(req, res));
   router.post("/:id/uso", (req, res) => compraController.marcarUtilizada(req, res));
+  router.get("/:id/mensajes", (req, res) => compraController.listarMensajes(req, res));
+  router.post("/:id/mensajes", (req, res) => compraController.enviarMensaje(req, res));
 
   return router;
 }

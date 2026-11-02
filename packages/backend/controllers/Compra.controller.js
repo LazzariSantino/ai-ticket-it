@@ -44,4 +44,16 @@ export class CompraController {
     const compra = await this.compraService.marcarUtilizada(req.usuario, req.params.id);
     return res.status(200).json(compra);
   }
+
+  async listarMensajes(req, res) {
+    const mensajes = await this.compraService.listarMensajes(req.usuario, req.params.id);
+    return res.status(200).json(mensajes);
+  }
+
+  async enviarMensaje(req, res) {
+    validarCamposRequeridos(req.body, ["mensaje"]);
+
+    const mensaje = await this.compraService.enviarMensaje(req.usuario, req.params.id, req.body.mensaje);
+    return res.status(201).json(mensaje);
+  }
 }

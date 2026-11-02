@@ -102,6 +102,35 @@ describe("API: /compras", () => {
     expect(otraVez.status).toBe(422);
   });
 
+  it("comprador y organizador chatean dentro de la compra, aun cancelada", async () => {
+    const { body: compra } = await comprar();
+    await request(app).post(`/compras/${compra.id}/cancelacion`).set("Authorization", compradora);
+    const intruso = await registrar("intruso");
+
+    const pregunta = await request(app)
+      .post(`/compras/${compra.id}/mensajes`)
+      .set("Authorization", compradora)
+      .send({ mensaje: "¿Cuándo vuelve a haber función?" });
+    await request(app)
+      .post(`/compras/${compra.id}/mensajes`)
+      .set("Authorization", organizadora)
+      .send({ mensaje: "En marzo" });
+    const chat = await request(app).get(`/compras/${compra.id}/mensajes`).set("Authorization", compradora);
+    const ajeno = await request(app).get(`/compras/${compra.id}/mensajes`).set("Authorization", intruso);
+    const vacio = await request(app)
+      .post(`/compras/${compra.id}/mensajes`)
+      .set("Authorization", compradora)
+      .send({ mensaje: "" });
+
+    expect(pregunta.status).toBe(201);
+    expect(chat.body.map((m) => [m.usuario.nombre, m.mensaje])).toEqual([
+      ["compradora", "¿Cuándo vuelve a haber función?"],
+      ["orga", "En marzo"],
+    ]);
+    expect(ajeno.status).toBe(403);
+    expect(vacio.status).toBe(400);
+  });
+
   it("POST /compras/:id/uso responde 403 si no lo hace el organizador", async () => {
     const { body: compra } = await comprar();
 
