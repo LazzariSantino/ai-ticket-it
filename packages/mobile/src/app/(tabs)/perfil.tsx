@@ -1,11 +1,15 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { URL_API } from "@/api/cliente";
+import { listarFavoritos } from "@/api/eventos";
 import { Boton } from "@/components/boton";
+import { Cargando } from "@/components/estado-pantalla";
+import { EventoCard } from "@/components/evento-card";
 import { PantallaTab } from "@/components/pantalla-tab";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Radio, Spacing } from "@/constants/theme";
+import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { useSesion, useUsuario } from "@/sesion/sesion-context";
 
@@ -13,6 +17,7 @@ export default function PerfilScreen() {
   const usuario = useUsuario();
   const { cerrarSesion } = useSesion();
   const theme = useTheme();
+  const favoritos = useConsulta(listarFavoritos);
 
   return (
     <PantallaTab titulo="Perfil">
@@ -31,6 +36,15 @@ export default function PerfilScreen() {
             <ThemedText themeColor="textSecondary">{usuario.email}</ThemedText>
           </View>
         </ThemedView>
+
+        <ThemedText type="subtitle">Mis favoritos</ThemedText>
+        {favoritos.cargando ? (
+          <Cargando />
+        ) : favoritos.datos?.length ? (
+          favoritos.datos.map((evento) => <EventoCard key={evento.id} evento={evento} />)
+        ) : (
+          <ThemedText themeColor="textSecondary">Tocá el ♡ en un evento para guardarlo acá.</ThemedText>
+        )}
 
         <Boton titulo="Cerrar sesión" variante="peligro" onPress={cerrarSesion} />
 
