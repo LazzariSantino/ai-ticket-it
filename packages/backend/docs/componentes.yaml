@@ -1,0 +1,13 @@
+components:
+  schemas:
+    Error:
+      type: object
+      description: Formato de error que devuelve el manejador global de errores.
+      properties:
+        status:
+          type: string
+          enum: [fail, error]
+          description: "`fail` para errores del cliente (4xx) y `error` para errores del servidor (5xx)."
+        message:
+          type: string
+          example: El evento con id 99 no existe
