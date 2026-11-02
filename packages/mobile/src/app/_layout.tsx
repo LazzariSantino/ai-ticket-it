@@ -1,18 +1,35 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "react-native";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { SesionProvider, useSesion } from "@/sesion/sesion-context";
 
-SplashScreen.preventAutoHideAsync();
+function Navegacion() {
+  const { usuario } = useSesion();
+  const logueado = usuario !== null;
 
-export default function TabLayout() {
+  // Stack.Protected muestra unas pantallas u otras según haya sesión, y redirige solo al cambiar
+  return (
+    <Stack screenOptions={{ headerBackButtonDisplayMode: "minimal" }}>
+      <Stack.Protected guard={logueado}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Protected guard={!logueado}>
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="registro" options={{ title: "Crear cuenta" }} />
+      </Stack.Protected>
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
   const colorScheme = useColorScheme();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <SesionProvider>
+        <StatusBar style="auto" />
+        <Navegacion />
+      </SesionProvider>
     </ThemeProvider>
   );
 }
