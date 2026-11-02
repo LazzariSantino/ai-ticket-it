@@ -3,6 +3,7 @@ import cors from "cors";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { crearMiddlewareAutenticar } from "./middleware/autenticar.js";
 import { montarSwagger } from "./config/swagger.js";
+import { cargarDatosDePrueba } from "./seed/datosDePrueba.js";
 
 import { crearAuthRouter } from "./routes/Auth.routes.js";
 import { crearCategoriaRouter } from "./routes/Categoria.routes.js";
@@ -28,7 +29,7 @@ import { CompraRepository } from "./repository/Compra.repository.js";
 
 // Arma la aplicación sin levantar el servidor, así los tests pueden crear una instancia nueva cada vez.
 // `reloj` permite fijar "el momento actual" en los tests.
-export async function crearApp({ reloj = () => new Date() } = {}) {
+export async function crearApp({ reloj = () => new Date(), conDatosDePrueba = false } = {}) {
   const app = express();
   app.use(express.json());
   app.use(
@@ -58,6 +59,13 @@ export async function crearApp({ reloj = () => new Date() } = {}) {
   await categoriaService.cargarCategoriasIniciales();
   const eventoService = new EventoService(eventoRepository, categoriaRepository, reseniaRepository, reloj);
   const compraService = new CompraService(compraRepository, eventoService, reseniaRepository, reloj);
+
+  if (conDatosDePrueba) {
+    await cargarDatosDePrueba(
+      { usuarioRepository, categoriaRepository, eventoRepository, compraRepository, reseniaRepository },
+      reloj(),
+    );
+  }
 
   // Controllers
   const authController = new AuthController(authService);
