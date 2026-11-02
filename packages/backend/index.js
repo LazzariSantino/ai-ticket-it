@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { crearApp } from "./app.js";
 
-const app = crearApp();
+const app = await crearApp();
 
 // 0.0.0.0 para que el celular pueda llegar al backend por la red local
 const PORT = process.env.SERVER_PORT || process.env.PORT || 8000;

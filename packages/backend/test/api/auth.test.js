@@ -5,8 +5,8 @@ describe("API: /auth", () => {
   const datos = { nombre: "Juan", apellido: "Pérez", email: "juan@mail.com", contrasenia: "secreta1" };
   let app;
 
-  beforeEach(() => {
-    app = crearApp();
+  beforeEach(async () => {
+    app = await crearApp();
   });
 
   it("POST /auth/registro responde 201 con token y usuario sin contraseña", async () => {

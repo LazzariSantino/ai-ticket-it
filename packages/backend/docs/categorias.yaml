@@ -1,0 +1,22 @@
+paths:
+  /categorias:
+    get:
+      tags: [Categorías]
+      summary: Listar categorías
+      description: Catálogo fijo con el que arranca la plataforma. Se usa para explorar eventos y para crearlos.
+      responses:
+        "200":
+          description: Todas las categorías.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Categoria" }
+components:
+  schemas:
+    Categoria:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        nombre: { type: string, example: Recitales }
+        descripcion: { type: string, example: Música en vivo, bandas y solistas }
