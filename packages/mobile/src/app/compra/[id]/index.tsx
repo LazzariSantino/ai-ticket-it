@@ -1,4 +1,4 @@
-import { Link, Stack, useLocalSearchParams } from "expo-router";
+import { Link, router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
@@ -120,6 +120,12 @@ export default function CompraScreen() {
             cargando={accionEnCurso === "cancelar"}
           />
         )}
+
+        <Boton
+          titulo={`${soyComprador ? "Chatear con el organizador" : "Chatear con el comprador"} (${compra.cantidadMensajes})`}
+          variante="secundario"
+          onPress={() => router.push(`/compra/${compra.id}/chat`)}
+        />
 
         <Tarjeta titulo="Historial">
           {compra.historial.map((cambio, indice) => (

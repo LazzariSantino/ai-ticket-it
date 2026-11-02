@@ -15,6 +15,7 @@ function Navegacion() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: "Inicio" }} />
         <Stack.Screen name="evento/[id]/index" options={{ title: "" }} />
         <Stack.Screen name="compra/[id]/index" options={{ title: "Compra" }} />
+        <Stack.Screen name="compra/[id]/chat" options={{ title: "Chat de la compra" }} />
       </Stack.Protected>
       <Stack.Protected guard={!logueado}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
