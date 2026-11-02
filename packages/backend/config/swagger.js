@@ -16,7 +16,10 @@ const opciones = {
       description: "API de la plataforma de publicación de eventos y venta de entradas.",
     },
     servers: [{ url: "/", description: "Servidor actual" }],
-    tags: [{ name: "Salud", description: "Estado del servicio" }],
+    tags: [
+      { name: "Salud", description: "Estado del servicio" },
+      { name: "Autenticación", description: "Registro, login y sesión del usuario" },
+    ],
   },
   // swagger-jsdoc usa globs, que necesitan barras "/" aunque estemos en Windows
   apis: [path.join(carpetaDeDocs, "*.yaml").replaceAll("\\", "/")],

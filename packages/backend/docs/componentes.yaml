@@ -1,4 +1,32 @@
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token que devuelven `/auth/login` y `/auth/registro`.
+
+  responses:
+    NoAutenticado:
+      description: Falta el token o no es válido.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    SinPermiso:
+      description: El usuario logueado no tiene permiso para esta acción.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NoEncontrado:
+      description: El recurso no existe.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ReglaDeNegocio:
+      description: La acción rompe una regla del negocio (por ejemplo, no hay cupo o el estado no lo permite).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
   schemas:
     Error:
       type: object
@@ -11,3 +39,28 @@ components:
         message:
           type: string
           example: El evento con id 99 no existe
+
+    UsuarioResumen:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        nombre: { type: string, example: Ana }
+        apellido: { type: string, example: Pérez }
+
+    Usuario:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        nombre: { type: string, example: Juan }
+        apellido: { type: string, example: Pérez }
+        email: { type: string, example: juan@mail.com }
+        favoritos:
+          type: array
+          description: Ids de los eventos favoritos.
+          items: { type: integer }
+
+    Sesion:
+      type: object
+      properties:
+        token: { type: string, example: 0b8f1c3e-6a3c-4c9e-9a57-2f1c1f7f0d11 }
+        usuario: { $ref: "#/components/schemas/Usuario" }

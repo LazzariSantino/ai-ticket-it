@@ -1,0 +1,87 @@
+paths:
+  /auth/registro:
+    post:
+      tags: [Autenticación]
+      summary: Registrar un usuario
+      description: Crea el usuario y deja la sesión iniciada. Un mismo usuario puede comprar entradas y organizar eventos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, apellido, email, contrasenia]
+              properties:
+                nombre: { type: string, example: Juan }
+                apellido: { type: string, example: Pérez }
+                email: { type: string, example: juan@mail.com }
+                contrasenia: { type: string, minLength: 6, example: secreta1 }
+      responses:
+        "201":
+          description: Usuario registrado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Sesion" }
+        "400":
+          description: Faltan campos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "409":
+          description: Ya existe un usuario con ese email.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "422":
+          description: Email con formato inválido o contraseña de menos de 6 caracteres.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /auth/login:
+    post:
+      tags: [Autenticación]
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, contrasenia]
+              properties:
+                email: { type: string, example: comprador@aiticketit.com }
+                contrasenia: { type: string, example: "123456" }
+      responses:
+        "200":
+          description: Sesión iniciada. El token se envía en el header `Authorization` del resto de las requests.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Sesion" }
+        "401":
+          description: Email o contraseña incorrectos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /auth/logout:
+    post:
+      tags: [Autenticación]
+      summary: Cerrar sesión
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204":
+          description: El token deja de ser válido.
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+  /auth/yo:
+    get:
+      tags: [Autenticación]
+      summary: Usuario de la sesión actual
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: El usuario logueado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
