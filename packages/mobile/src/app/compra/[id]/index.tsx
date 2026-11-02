@@ -7,6 +7,8 @@ import type { Compra } from "@/api/tipos";
 import { Boton } from "@/components/boton";
 import { EstadoBadge, textoEstado } from "@/components/estado-badge";
 import { Cargando, ErrorPantalla } from "@/components/estado-pantalla";
+import { FormularioResenia } from "@/components/formulario-resenia";
+import { ReseniaItem } from "@/components/resenia-item";
 import { Tarjeta } from "@/components/tarjeta";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -119,6 +121,18 @@ export default function CompraScreen() {
             onPress={pedirCancelacion}
             cargando={accionEnCurso === "cancelar"}
           />
+        )}
+
+        {soyComprador && compra.puedeSerReseniada && (
+          <FormularioResenia
+            compraId={compra.id}
+            onReseniada={(resenia) => setDatos({ ...compra, resenia, puedeSerReseniada: false })}
+          />
+        )}
+        {compra.resenia && (
+          <Tarjeta titulo={soyComprador ? "Tu reseña" : "Reseña del comprador"}>
+            <ReseniaItem resenia={compra.resenia} />
+          </Tarjeta>
         )}
 
         <Boton
