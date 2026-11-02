@@ -5,9 +5,10 @@ import { NotFoundError } from "../errors/NotFoundError.js";
 import { ValidationError } from "../errors/ValidationError.js";
 
 export class CompraService {
-  constructor(compraRepository, eventoService, reloj = () => new Date()) {
+  constructor(compraRepository, eventoService, reseniaRepository, reloj = () => new Date()) {
     this._compraRepository = compraRepository;
     this._eventoService = eventoService;
+    this._reseniaRepository = reseniaRepository;
     this._reloj = reloj;
   }
 
@@ -83,6 +84,15 @@ export class CompraService {
     const mensaje = compra.enviarMensaje(usuario, texto, this._reloj());
     await this._compraRepository.guardar(compra);
     return mensaje;
+  }
+
+  // La reseña queda guardada aparte para poder mostrarla en los eventos del organizador
+  async reseniar(usuario, compraId, { detalle, puntuacion }) {
+    const compra = await this.obtenerCompra(usuario, compraId);
+    const resenia = compra.reseniar(usuario, { detalle, puntuacion }, this._reloj());
+    await this._reseniaRepository.guardar(resenia);
+    await this._compraRepository.guardar(compra);
+    return resenia;
   }
 
   _validarEstado(estado) {

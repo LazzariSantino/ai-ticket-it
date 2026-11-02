@@ -13,6 +13,7 @@ export function crearCompraRouter(compraController, autenticar) {
   router.post("/:id/uso", (req, res) => compraController.marcarUtilizada(req, res));
   router.get("/:id/mensajes", (req, res) => compraController.listarMensajes(req, res));
   router.post("/:id/mensajes", (req, res) => compraController.enviarMensaje(req, res));
+  router.post("/:id/resenia", (req, res) => compraController.reseniar(req, res));
 
   return router;
 }

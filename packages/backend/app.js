@@ -57,7 +57,7 @@ export async function crearApp({ reloj = () => new Date() } = {}) {
   const categoriaService = new CategoriaService(categoriaRepository);
   await categoriaService.cargarCategoriasIniciales();
   const eventoService = new EventoService(eventoRepository, categoriaRepository, reseniaRepository, reloj);
-  const compraService = new CompraService(compraRepository, eventoService, reloj);
+  const compraService = new CompraService(compraRepository, eventoService, reseniaRepository, reloj);
 
   // Controllers
   const authController = new AuthController(authService);

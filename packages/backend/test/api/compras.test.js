@@ -131,6 +131,28 @@ describe("API: /compras", () => {
     expect(vacio.status).toBe(400);
   });
 
+  it("después de utilizar la entrada se puede reseñar y la reseña aparece en los eventos del organizador", async () => {
+    const { body: compra } = await comprar();
+    const reseniaAntes = await request(app)
+      .post(`/compras/${compra.id}/resenia`)
+      .set("Authorization", compradora)
+      .send({ puntuacion: 5, detalle: "Impecable" });
+    await request(app).post(`/compras/${compra.id}/pago`).set("Authorization", compradora);
+    ahora = new Date("2026-12-10T22:00:00.000Z");
+    await request(app).post(`/compras/${compra.id}/uso`).set("Authorization", organizadora);
+
+    const resenia = await request(app)
+      .post(`/compras/${compra.id}/resenia`)
+      .set("Authorization", compradora)
+      .send({ puntuacion: 4, detalle: "Muy buen show" });
+    const detalle = await request(app).get(`/eventos/${evento.id}`).set("Authorization", compradora);
+
+    expect(reseniaAntes.status).toBe(422);
+    expect(resenia.status).toBe(201);
+    expect(detalle.body.organizador.puntaje).toBe(4);
+    expect(detalle.body.reseniasDelOrganizador.map((r) => r.detalle)).toEqual(["Muy buen show"]);
+  });
+
   it("POST /compras/:id/uso responde 403 si no lo hace el organizador", async () => {
     const { body: compra } = await comprar();
 

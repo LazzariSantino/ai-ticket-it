@@ -19,19 +19,16 @@ describe("CompraService", () => {
 
   let service;
   let evento;
+  let reseniaRepository;
 
   beforeEach(async () => {
     ahora = new Date("2026-11-01T12:00:00.000Z");
     const reloj = () => ahora;
     const categoriaRepository = new CategoriaRepository();
     await new CategoriaService(categoriaRepository).cargarCategoriasIniciales();
-    const eventoService = new EventoService(
-      new EventoRepository(),
-      categoriaRepository,
-      new ReseniaRepository(),
-      reloj,
-    );
-    service = new CompraService(new CompraRepository(), eventoService, reloj);
+    reseniaRepository = new ReseniaRepository();
+    const eventoService = new EventoService(new EventoRepository(), categoriaRepository, reseniaRepository, reloj);
+    service = new CompraService(new CompraRepository(), eventoService, reseniaRepository, reloj);
     evento = await eventoService.crearEvento(organizadora, datosDeEvento(1));
   });
 
@@ -177,6 +174,30 @@ describe("CompraService", () => {
 
       await expect(service.pagar(otro, compra.id)).rejects.toThrow(ForbiddenError);
       await expect(service.cancelar(otro, compra.id)).rejects.toThrow(ForbiddenError);
+    });
+  });
+
+  describe("reseniar", () => {
+    it("guarda la reseña para mostrarla en los eventos del organizador", async () => {
+      const compra = await comprar();
+      await service.pagar(compradora, compra.id);
+      ahora = new Date("2026-12-10T22:00:00.000Z");
+      await service.marcarUtilizada(organizadora, compra.id);
+
+      await service.reseniar(compradora, compra.id, { puntuacion: 5, detalle: "Gran noche" });
+
+      const resenias = await reseniaRepository.buscarPorOrganizador(organizadora.id);
+      expect(resenias.map((r) => r.detalle)).toEqual(["Gran noche"]);
+      expect(compra.resenia).toBe(resenias[0]);
+    });
+
+    it("no guarda nada si la compra todavía no se utilizó", async () => {
+      const compra = await comprar();
+
+      await expect(service.reseniar(compradora, compra.id, { puntuacion: 5, detalle: "Gran noche" })).rejects.toThrow(
+        "Sólo se puede reseñar el evento una vez utilizada la entrada",
+      );
+      expect(await reseniaRepository.buscarTodos()).toEqual([]);
     });
   });
 });

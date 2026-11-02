@@ -56,4 +56,12 @@ export class CompraController {
     const mensaje = await this.compraService.enviarMensaje(req.usuario, req.params.id, req.body.mensaje);
     return res.status(201).json(mensaje);
   }
+
+  async reseniar(req, res) {
+    validarCamposRequeridos(req.body, ["puntuacion", "detalle"]);
+    const { puntuacion, detalle } = req.body;
+
+    const resenia = await this.compraService.reseniar(req.usuario, req.params.id, { puntuacion, detalle });
+    return res.status(201).json(resenia);
+  }
 }
