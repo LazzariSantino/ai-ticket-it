@@ -125,4 +125,58 @@ describe("CompraService", () => {
       await expect(service.obtenerCompra(compradora, 99)).rejects.toThrow("La compra con id 99 no existe");
     });
   });
+
+  describe("cambios de estado", () => {
+    const diaDelEvento = new Date("2026-12-10T22:00:00.000Z");
+    const despuesDelEvento = new Date("2026-12-12T12:00:00.000Z");
+
+    it("pagar confirma la compra y muestra los días que faltan", async () => {
+      const compra = await comprar();
+
+      await service.pagar(compradora, compra.id);
+
+      expect(compra.estado).toBe(EstadoCompra.CONFIRMADA);
+      expect(compra.diasParaEvento(ahora)).toBe(39);
+    });
+
+    it("cancelar una compra pagada la reembolsa y devuelve el cupo", async () => {
+      const compra = await comprar(2);
+      await service.pagar(compradora, compra.id);
+
+      await service.cancelar(compradora, compra.id);
+
+      expect(compra.estado).toBe(EstadoCompra.REEMBOLSADA);
+      expect(compra.tipoEntrada.cupo).toBe(100);
+    });
+
+    it("no se puede cancelar después del evento", async () => {
+      const compra = await comprar();
+      await service.pagar(compradora, compra.id);
+      ahora = despuesDelEvento;
+
+      await expect(service.cancelar(compradora, compra.id)).rejects.toThrow(
+        "No se puede cancelar una compra de un evento que ya se realizó",
+      );
+    });
+
+    it("el organizador marca la compra como utilizada el día del evento y ya no se puede cancelar", async () => {
+      const compra = await comprar();
+      await service.pagar(compradora, compra.id);
+      ahora = diaDelEvento;
+
+      await service.marcarUtilizada(organizadora, compra.id);
+
+      expect(compra.estado).toBe(EstadoCompra.UTILIZADA);
+      await expect(service.cancelar(compradora, compra.id)).rejects.toThrow(
+        "No se puede cancelar una compra de un evento que ya se realizó",
+      );
+    });
+
+    it("alguien ajeno a la compra no puede cambiarle el estado", async () => {
+      const compra = await comprar();
+
+      await expect(service.pagar(otro, compra.id)).rejects.toThrow(ForbiddenError);
+      await expect(service.cancelar(otro, compra.id)).rejects.toThrow(ForbiddenError);
+    });
+  });
 });

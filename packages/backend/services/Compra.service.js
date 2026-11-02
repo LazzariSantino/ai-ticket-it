@@ -55,6 +55,24 @@ export class CompraService {
     return compra;
   }
 
+  async pagar(usuario, compraId) {
+    const compra = await this.obtenerCompra(usuario, compraId);
+    compra.pagar(usuario, this._reloj());
+    return await this._compraRepository.guardar(compra);
+  }
+
+  async cancelar(usuario, compraId) {
+    const compra = await this.obtenerCompra(usuario, compraId);
+    compra.cancelar(usuario, this._reloj());
+    return await this._compraRepository.guardar(compra);
+  }
+
+  async marcarUtilizada(usuario, compraId) {
+    const compra = await this.obtenerCompra(usuario, compraId);
+    compra.marcarUtilizada(usuario, this._reloj());
+    return await this._compraRepository.guardar(compra);
+  }
+
   _validarEstado(estado) {
     if (estado !== undefined && !esEstadoCompraValido(estado)) {
       throw new ValidationError(`El estado ${estado} no existe. Opciones: ${Object.values(EstadoCompra).join(", ")}`);

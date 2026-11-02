@@ -73,4 +73,40 @@ describe("API: /compras", () => {
     expect(organizador.body.tiposEntrada[0].cupoDisponible).toBe(98);
     expect(comprador.status).toBe(403);
   });
+
+  it("recorre el flujo pagar → utilizar, con el historial de cambios de estado", async () => {
+    const { body: compra } = await comprar();
+
+    const pago = await request(app).post(`/compras/${compra.id}/pago`).set("Authorization", compradora);
+    ahora = new Date("2026-12-10T22:00:00.000Z");
+    const uso = await request(app).post(`/compras/${compra.id}/uso`).set("Authorization", organizadora);
+
+    expect(pago.status).toBe(200);
+    expect(pago.body.estado).toBe("CONFIRMADA");
+    expect(uso.body.estado).toBe("UTILIZADA");
+    expect(uso.body.historial.map((cambio) => [cambio.estado, cambio.quien.nombre])).toEqual([
+      ["PENDIENTE", "compradora"],
+      ["CONFIRMADA", "compradora"],
+      ["UTILIZADA", "orga"],
+    ]);
+  });
+
+  it("POST /compras/:id/cancelacion reembolsa una compra pagada y responde 422 si se repite", async () => {
+    const { body: compra } = await comprar();
+    await request(app).post(`/compras/${compra.id}/pago`).set("Authorization", compradora);
+
+    const cancelacion = await request(app).post(`/compras/${compra.id}/cancelacion`).set("Authorization", compradora);
+    const otraVez = await request(app).post(`/compras/${compra.id}/cancelacion`).set("Authorization", compradora);
+
+    expect(cancelacion.body.estado).toBe("REEMBOLSADA");
+    expect(otraVez.status).toBe(422);
+  });
+
+  it("POST /compras/:id/uso responde 403 si no lo hace el organizador", async () => {
+    const { body: compra } = await comprar();
+
+    const respuesta = await request(app).post(`/compras/${compra.id}/uso`).set("Authorization", compradora);
+
+    expect(respuesta.status).toBe(403);
+  });
 });

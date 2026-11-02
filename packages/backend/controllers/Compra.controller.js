@@ -29,4 +29,19 @@ export class CompraController {
     const compra = await this.compraService.obtenerCompra(req.usuario, req.params.id);
     return res.status(200).json(compra);
   }
+
+  async pagar(req, res) {
+    const compra = await this.compraService.pagar(req.usuario, req.params.id);
+    return res.status(200).json(compra);
+  }
+
+  async cancelar(req, res) {
+    const compra = await this.compraService.cancelar(req.usuario, req.params.id);
+    return res.status(200).json(compra);
+  }
+
+  async marcarUtilizada(req, res) {
+    const compra = await this.compraService.marcarUtilizada(req.usuario, req.params.id);
+    return res.status(200).json(compra);
+  }
 }
