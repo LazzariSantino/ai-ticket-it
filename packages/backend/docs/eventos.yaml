@@ -1,0 +1,235 @@
+paths:
+  /eventos:
+    get:
+      tags: [Eventos]
+      summary: Buscar eventos
+      description: >-
+        Devuelve los eventos que todavía no se realizaron. Se puede buscar por texto (en nombre, descripción y
+        categoría, sin importar mayúsculas ni tildes), filtrar por categoría y rango de precio, y ordenar.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: q, schema: { type: string }, example: jazz }
+        - { in: query, name: categoriaId, schema: { type: integer }, example: 1 }
+        - in: query
+          name: precioMinimo
+          description: Algún tipo de entrada tiene que costar al menos esto.
+          schema: { type: number }
+        - in: query
+          name: precioMaximo
+          description: Algún tipo de entrada tiene que costar como mucho esto.
+          schema: { type: number }
+        - in: query
+          name: orden
+          description: >-
+            `precio` (precio de la entrada más barata), `fecha` (del evento) o `puntaje` (promedio de las reseñas
+            del organizador; los organizadores sin reseñas van al final).
+          schema: { type: string, enum: [precio, fecha, puntaje], default: fecha }
+        - in: query
+          name: direccion
+          description: Por defecto `asc` para precio y fecha, y `desc` para puntaje.
+          schema: { type: string, enum: [asc, desc] }
+      responses:
+        "200":
+          description: Eventos que cumplen los filtros.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Evento" }
+        "400":
+          description: Un filtro numérico no es un número o el orden no es válido.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+    post:
+      tags: [Eventos]
+      summary: Crear un evento
+      description: El usuario logueado queda como organizador.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, descripcion, categoriaId, fecha, tiposEntrada]
+              properties:
+                nombre: { type: string, example: Noche de Jazz }
+                descripcion: { type: string, example: Trío en vivo en el centro cultural }
+                categoriaId: { type: integer, example: 1 }
+                fecha: { type: string, format: date-time, example: "2026-12-10T21:00:00.000Z" }
+                multimedia:
+                  type: array
+                  items: { type: string, example: "https://picsum.photos/seed/jazz/800/450" }
+                tiposEntrada:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [nombre, precio, cupo]
+                    properties:
+                      nombre: { type: string, example: Platea }
+                      descripcion: { type: string, example: Sector sentado }
+                      precio: { type: number, example: 15000 }
+                      cupo: { type: integer, example: 100 }
+      responses:
+        "201":
+          description: Evento creado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Evento" }
+        "400":
+          description: Faltan campos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "422":
+          description: >-
+            La categoría no existe, la fecha no es futura, no hay tipos de entrada, hay dos con el mismo nombre o
+            algún precio o cupo es inválido.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /eventos/mios:
+    get:
+      tags: [Eventos]
+      summary: Eventos que organiza el usuario logueado
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Todos sus eventos, incluso los que ya se realizaron, ordenados por fecha.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Evento" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+  /eventos/favoritos:
+    get:
+      tags: [Eventos]
+      summary: Eventos favoritos del usuario logueado
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Sus eventos favoritos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Evento" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+  /eventos/{id}:
+    get:
+      tags: [Eventos]
+      summary: Detalle de un evento
+      description: Incluye las reseñas de todos los eventos del organizador, para conocer experiencias previas.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: El evento.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Evento"
+                  - type: object
+                    properties:
+                      esFavorito: { type: boolean }
+                      esOrganizador: { type: boolean }
+                      reseniasDelOrganizador:
+                        type: array
+                        items: { $ref: "#/components/schemas/Resenia" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+  /eventos/{id}/favorito:
+    put:
+      tags: [Eventos]
+      summary: Marcar un evento como favorito
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: El usuario con sus favoritos actualizados.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+    delete:
+      tags: [Eventos]
+      summary: Quitar un evento de favoritos
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: El usuario con sus favoritos actualizados.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+components:
+  schemas:
+    TipoEntrada:
+      type: object
+      properties:
+        id: { type: integer, description: Posición dentro del evento (1, 2, 3...), example: 1 }
+        nombre: { type: string, example: Platea }
+        descripcion: { type: string, example: Sector sentado }
+        precio: { type: number, example: 15000 }
+        cupoTotal: { type: integer, example: 100 }
+        cupoDisponible: { type: integer, example: 87 }
+        vendidas: { type: integer, example: 13 }
+    Evento:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        nombre: { type: string, example: Noche de Jazz }
+        descripcion: { type: string, example: Trío en vivo en el centro cultural }
+        categoria: { $ref: "#/components/schemas/Categoria" }
+        fecha: { type: string, format: date-time }
+        multimedia:
+          type: array
+          items: { type: string }
+        organizador:
+          allOf:
+            - $ref: "#/components/schemas/UsuarioResumen"
+            - type: object
+              properties:
+                puntaje: { type: number, nullable: true, example: 4.5 }
+                cantidadResenias: { type: integer, example: 2 }
+        tiposEntrada:
+          type: array
+          items: { $ref: "#/components/schemas/TipoEntrada" }
+        precioMinimo: { type: number, example: 10000 }
+        entradasDisponibles: { type: integer, example: 97 }
+    Resenia:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        comprador: { $ref: "#/components/schemas/UsuarioResumen" }
+        evento:
+          type: object
+          properties:
+            id: { type: integer }
+            nombre: { type: string }
+            fecha: { type: string, format: date-time }
+        detalle: { type: string, example: Excelente sonido y muy puntuales }
+        puntuacion: { type: number, minimum: 1, maximum: 5, example: 5 }
+        fecha: { type: string, format: date-time }

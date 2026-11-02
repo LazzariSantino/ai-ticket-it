@@ -20,6 +20,7 @@ const opciones = {
       { name: "Salud", description: "Estado del servicio" },
       { name: "Autenticación", description: "Registro, login y sesión del usuario" },
       { name: "Categorías", description: "Categorías para explorar los eventos" },
+      { name: "Eventos", description: "Publicación, búsqueda y favoritos de eventos" },
     ],
   },
   // swagger-jsdoc usa globs, que necesitan barras "/" aunque estemos en Windows
