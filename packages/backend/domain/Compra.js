@@ -3,6 +3,7 @@ import { UnprocessableEntityError } from "../errors/UnprocessableEntityError.js"
 import { CambioEstadoCompra } from "./CambioEstadoCompra.js";
 import { EstadoCompra, puedePasarDe } from "./EstadoCompra.js";
 import { Mensaje } from "./Mensaje.js";
+import { Resenia } from "./Resenia.js";
 
 const MILISEGUNDOS_POR_DIA = 24 * 60 * 60 * 1000;
 
@@ -22,7 +23,10 @@ export class Compra {
     this.fecha = fecha;
     this.estado = EstadoCompra.PENDIENTE;
     this.mensajes = [];
-    this.historial = [new CambioEstadoCompra({ compra: this, estado: this.estado, quien: comprador, fechaHora: fecha })];
+    this.resenia = null;
+    this.historial = [
+      new CambioEstadoCompra({ compra: this, estado: this.estado, quien: comprador, fechaHora: fecha }),
+    ];
   }
 
   // Valida las reglas de la compra y reserva el cupo. La compra queda pendiente de pago.
@@ -123,6 +127,25 @@ export class Compra {
     return mensaje;
   }
 
+  puedeSerReseniada() {
+    return this.estado === EstadoCompra.UTILIZADA && !this.resenia;
+  }
+
+  // Una vez utilizada la entrada, quien compró puede puntuar el evento una única vez
+  reseniar(quien, { detalle, puntuacion }, ahora = new Date()) {
+    if (!this.esComprador(quien)) {
+      throw new ForbiddenError("Sólo quien hizo la compra puede reseñar el evento");
+    }
+    if (this.estado !== EstadoCompra.UTILIZADA) {
+      throw new UnprocessableEntityError("Sólo se puede reseñar el evento una vez utilizada la entrada");
+    }
+    if (this.resenia) {
+      throw new UnprocessableEntityError("Esta compra ya tiene una reseña");
+    }
+    this.resenia = new Resenia({ comprador: quien, evento: this.evento, detalle, puntuacion, fecha: ahora });
+    return this.resenia;
+  }
+
   toJSON() {
     const ahora = new Date();
     return {
@@ -143,6 +166,8 @@ export class Compra {
       diasParaEvento: this.diasParaEvento(ahora),
       puedeCancelarse: this.puedeCancelarse(ahora),
       cantidadMensajes: this.mensajes.length,
+      puedeSerReseniada: this.puedeSerReseniada(),
+      resenia: this.resenia,
       historial: this.historial,
     };
   }

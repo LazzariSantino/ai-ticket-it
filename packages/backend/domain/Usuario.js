@@ -23,9 +23,7 @@ export class Usuario {
 
   static registrar({ nombre, apellido, email, contrasenia }) {
     if (typeof contrasenia !== "string" || contrasenia.length < LARGO_MINIMO_CONTRASENIA) {
-      throw new UnprocessableEntityError(
-        `La contraseña debe tener al menos ${LARGO_MINIMO_CONTRASENIA} caracteres`,
-      );
+      throw new UnprocessableEntityError(`La contraseña debe tener al menos ${LARGO_MINIMO_CONTRASENIA} caracteres`);
     }
     return new Usuario({ nombre, apellido, email, hashContrasenia: hashearContrasenia(contrasenia) });
   }

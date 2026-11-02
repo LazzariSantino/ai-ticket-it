@@ -4,10 +4,7 @@ import { validarFecha, validarTexto } from "./validaciones.js";
 
 // Pasa a minúsculas y saca las tildes, para que "Música" y "musica" coincidan en las búsquedas
 export function normalizarTexto(texto) {
-  return texto
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase();
+  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
 export class Evento {
