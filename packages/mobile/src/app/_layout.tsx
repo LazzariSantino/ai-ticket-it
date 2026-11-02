@@ -12,7 +12,8 @@ function Navegacion() {
   return (
     <Stack screenOptions={{ headerBackButtonDisplayMode: "minimal" }}>
       <Stack.Protected guard={logueado}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, title: "Inicio" }} />
+        <Stack.Screen name="evento/[id]/index" options={{ title: "" }} />
       </Stack.Protected>
       <Stack.Protected guard={!logueado}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
