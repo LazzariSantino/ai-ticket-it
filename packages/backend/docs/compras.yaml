@@ -1,0 +1,321 @@
+paths:
+  /compras:
+    post:
+      tags: [Compras]
+      summary: Comprar entradas
+      description: >-
+        Reserva el cupo del tipo de entrada elegido y crea la compra en estado `PENDIENTE` hasta que se pague.
+        No se puede comprar para un evento que ya se realizó ni para uno propio.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventoId, tipoEntradaId, cantidad]
+              properties:
+                eventoId: { type: integer, example: 1 }
+                tipoEntradaId: { type: integer, example: 1 }
+                cantidad: { type: integer, minimum: 1, example: 2 }
+      responses:
+        "201":
+          description: Compra creada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Compra" }
+        "400":
+          description: Faltan campos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+        "422":
+          $ref: "#/components/responses/ReglaDeNegocio"
+    get:
+      tags: [Compras]
+      summary: Mis compras
+      description: Las compras del usuario logueado, de la más nueva a la más vieja.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: estado
+          schema: { $ref: "#/components/schemas/EstadoCompra" }
+      responses:
+        "200":
+          description: Las compras.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Compra" }
+        "400":
+          description: El estado no existe.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+  /eventos/{eventoId}/compras:
+    get:
+      tags: [Compras]
+      summary: Compras de un evento (organizador)
+      description: Las compras del evento, cuántas hay en cada estado y cuántas entradas quedan de cada tipo.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: eventoId, required: true, schema: { type: integer } }
+        - in: query
+          name: estado
+          schema: { $ref: "#/components/schemas/EstadoCompra" }
+      responses:
+        "200":
+          description: Resumen de ventas del evento.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  evento:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      nombre: { type: string }
+                      fecha: { type: string, format: date-time }
+                  tiposEntrada:
+                    type: array
+                    items: { $ref: "#/components/schemas/TipoEntrada" }
+                  cantidadPorEstado:
+                    type: object
+                    additionalProperties: { type: integer }
+                    example: { PENDIENTE: 1, CONFIRMADA: 4, UTILIZADA: 0, CANCELADA: 0, REEMBOLSADA: 1 }
+                  compras:
+                    type: array
+                    items: { $ref: "#/components/schemas/Compra" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+  /compras/{id}:
+    get:
+      tags: [Compras]
+      summary: Detalle de una compra
+      description: La pueden ver el comprador y el organizador del evento.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: La compra.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Compra" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+  /compras/{id}/pago:
+    post:
+      tags: [Compras]
+      summary: Pagar una compra (simulado)
+      description: "El comprador confirma el pago: `PENDIENTE` → `CONFIRMADA`."
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Compra confirmada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Compra" }
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+        "422":
+          $ref: "#/components/responses/ReglaDeNegocio"
+  /compras/{id}/cancelacion:
+    post:
+      tags: [Compras]
+      summary: Cancelar una compra
+      description: >-
+        Sólo el comprador, mientras la compra no esté utilizada (ni ya cancelada) y el evento no se haya realizado.
+        Libera el cupo. Si estaba pagada pasa a `CANCELADA` y luego a `REEMBOLSADA`; si no, queda `CANCELADA`.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Compra cancelada o reembolsada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Compra" }
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+        "422":
+          $ref: "#/components/responses/ReglaDeNegocio"
+  /compras/{id}/uso:
+    post:
+      tags: [Compras]
+      summary: Marcar una compra como utilizada
+      description: "El organizador valida las entradas en el acceso, a partir del día del evento: `CONFIRMADA` → `UTILIZADA`."
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Compra utilizada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Compra" }
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+        "422":
+          $ref: "#/components/responses/ReglaDeNegocio"
+  /compras/{id}/mensajes:
+    get:
+      tags: [Compras]
+      summary: Chat de la compra
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Los mensajes, del más viejo al más nuevo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Mensaje" }
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+    post:
+      tags: [Compras]
+      summary: Enviar un mensaje
+      description: Comprador y organizador pueden escribir en cualquier momento, sin importar el estado de la compra.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mensaje]
+              properties:
+                mensaje: { type: string, maxLength: 1000, example: ¿A qué hora abren las puertas? }
+      responses:
+        "201":
+          description: Mensaje enviado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Mensaje" }
+        "400":
+          description: Falta el mensaje.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "404":
+          $ref: "#/components/responses/NoEncontrado"
+  /compras/{id}/resenia:
+    post:
+      tags: [Compras]
+      summary: Reseñar el evento
+      description: Sólo el comprador, una vez utilizada la entrada y una única vez por compra.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [puntuacion, detalle]
+              properties:
+                puntuacion: { type: number, minimum: 1, maximum: 5, example: 5 }
+                detalle: { type: string, example: Excelente sonido y muy puntuales }
+      responses:
+        "201":
+          description: Reseña creada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Resenia" }
+        "400":
+          description: Faltan campos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          $ref: "#/components/responses/SinPermiso"
+        "422":
+          $ref: "#/components/responses/ReglaDeNegocio"
+components:
+  schemas:
+    EstadoCompra:
+      type: string
+      enum: [PENDIENTE, CONFIRMADA, UTILIZADA, CANCELADA, REEMBOLSADA]
+    Mensaje:
+      type: object
+      properties:
+        usuario: { $ref: "#/components/schemas/UsuarioResumen" }
+        mensaje: { type: string, example: ¿A qué hora abren las puertas? }
+        enviado: { type: string, format: date-time }
+    CambioEstadoCompra:
+      type: object
+      properties:
+        estado: { $ref: "#/components/schemas/EstadoCompra" }
+        quien: { $ref: "#/components/schemas/UsuarioResumen" }
+        fechaHora: { type: string, format: date-time }
+    Compra:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        comprador: { $ref: "#/components/schemas/UsuarioResumen" }
+        evento:
+          type: object
+          properties:
+            id: { type: integer }
+            nombre: { type: string }
+            fecha: { type: string, format: date-time }
+            multimedia: { type: array, items: { type: string } }
+            organizador: { $ref: "#/components/schemas/UsuarioResumen" }
+        tipoEntrada:
+          type: object
+          properties:
+            id: { type: integer }
+            nombre: { type: string }
+            precio: { type: number }
+        cantidad: { type: integer, example: 2 }
+        total: { type: number, example: 30000 }
+        fecha: { type: string, format: date-time, description: Cuándo se hizo la compra }
+        estado: { $ref: "#/components/schemas/EstadoCompra" }
+        diasParaEvento:
+          type: integer
+          nullable: true
+          description: Días de calendario que faltan para el evento. Sólo para compras confirmadas.
+        puedeCancelarse: { type: boolean }
+        puedeSerReseniada: { type: boolean }
+        cantidadMensajes: { type: integer }
+        resenia:
+          allOf:
+            - $ref: "#/components/schemas/Resenia"
+          nullable: true
+        historial:
+          type: array
+          items: { $ref: "#/components/schemas/CambioEstadoCompra" }
