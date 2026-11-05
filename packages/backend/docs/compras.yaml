@@ -236,7 +236,7 @@ paths:
     post:
       tags: [Compras]
       summary: Reseñar el evento
-      description: Sólo el comprador, una vez utilizada la entrada y una única vez por compra.
+      description: Sólo el comprador, una vez utilizada la entrada y una única vez por evento (aunque haya hecho varias compras para el mismo evento).
       security: [{ bearerAuth: [] }]
       parameters:
         - { in: path, name: id, required: true, schema: { type: integer } }

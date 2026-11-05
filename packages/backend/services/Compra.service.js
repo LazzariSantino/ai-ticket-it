@@ -2,6 +2,7 @@ import { Compra, PLAZO_PARA_PAGAR_POR_DEFECTO_MINUTOS } from "../domain/Compra.j
 import { EstadoCompra, esEstadoCompraValido } from "../domain/EstadoCompra.js";
 import { ForbiddenError } from "../errors/ForbiddenError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
+import { UnprocessableEntityError } from "../errors/UnprocessableEntityError.js";
 import { ValidationError } from "../errors/ValidationError.js";
 
 export class CompraService {
@@ -100,9 +101,13 @@ export class CompraService {
     return mensaje;
   }
 
-  // La reseña queda guardada aparte para poder mostrarla en los eventos del organizador
+  // La reseña queda guardada aparte para poder mostrarla en los eventos del organizador.
+  // Es una por comprador y evento: con dos compras para el mismo evento no se puede puntuar dos veces.
   async reseniar(usuario, compraId, { detalle, puntuacion }) {
     const compra = await this.obtenerCompra(usuario, compraId);
+    if (await this._yaReseniado(compra)) {
+      throw new UnprocessableEntityError("Ya reseñaste este evento");
+    }
     const resenia = compra.reseniar(usuario, { detalle, puntuacion }, this._reloj());
     await this._reseniaRepository.guardar(resenia);
     await this._compraRepository.guardar(compra);
@@ -122,7 +127,12 @@ export class CompraService {
 
   // Arma la respuesta de una compra con el reloj de la aplicación
   async presentar(compra) {
-    return compra.aJSON(this._reloj());
+    const json = compra.aJSON(this._reloj());
+    return { ...json, puedeSerReseniada: json.puedeSerReseniada && !(await this._yaReseniado(compra)) };
+  }
+
+  async _yaReseniado(compra) {
+    return (await this._reseniaRepository.buscarDeCompradorEnEvento(compra.comprador.id, compra.evento.id)) !== null;
   }
 
   _validarEstado(estado) {

@@ -191,6 +191,24 @@ describe("CompraService", () => {
       expect(compra.resenia).toBe(resenias[0]);
     });
 
+    it("con dos compras para el mismo evento se reseña una sola vez, para no contar doble", async () => {
+      const primera = await comprar(1);
+      const segunda = await comprar(1);
+      await service.pagar(compradora, primera.id);
+      await service.pagar(compradora, segunda.id);
+      ahora = new Date("2026-12-10T22:00:00.000Z");
+      await service.marcarUtilizada(organizadora, primera.id);
+      await service.marcarUtilizada(organizadora, segunda.id);
+      await service.reseniar(compradora, primera.id, { puntuacion: 5, detalle: "Gran noche" });
+
+      await expect(service.reseniar(compradora, segunda.id, { puntuacion: 5, detalle: "Otra vez" })).rejects.toThrow(
+        "Ya reseñaste este evento",
+      );
+      expect((await service.presentar(segunda)).puedeSerReseniada).toBe(false);
+      expect(await reseniaRepository.buscarTodos()).toHaveLength(1);
+      expect(segunda.resenia).toBeNull();
+    });
+
     it("no guarda nada si la compra todavía no se utilizó", async () => {
       const compra = await comprar();
 
