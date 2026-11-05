@@ -44,6 +44,18 @@ describe("API: /compras", () => {
     });
   });
 
+  it("la respuesta usa el reloj de la aplicación y no la fecha real de la computadora", async () => {
+    const { body: compra } = await comprar();
+    await request(app).post(`/compras/${compra.id}/pago`).set("Authorization", compradora);
+
+    const antes = await request(app).get(`/compras/${compra.id}`).set("Authorization", compradora);
+    ahora = new Date("2026-12-11T12:00:00.000Z");
+    const despues = await request(app).get(`/compras/${compra.id}`).set("Authorization", compradora);
+
+    expect(antes.body).toMatchObject({ puedeCancelarse: true, diasParaEvento: expect.any(Number) });
+    expect(despues.body).toMatchObject({ puedeCancelarse: false, diasParaEvento: null });
+  });
+
   it("POST /compras responde 400 si faltan campos y 422 si se supera el cupo", async () => {
     const sinCampos = await request(app).post("/compras").set("Authorization", compradora).send({});
     const sinCupo = await comprar(101);

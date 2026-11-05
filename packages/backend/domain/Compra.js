@@ -149,8 +149,9 @@ export class Compra {
     return this.resenia;
   }
 
-  toJSON() {
-    const ahora = new Date();
+  // Lo que ve la app de una compra. Recibe el momento actual del reloj de la aplicación (no usa new Date())
+  // para que los días que faltan y si se puede cancelar coincidan con las reglas del dominio y con los tests.
+  aJSON(ahora) {
     return {
       id: this.id,
       comprador: this.comprador.resumen(),

@@ -95,6 +95,11 @@ export class CompraService {
     return resenia;
   }
 
+  // Arma la respuesta de una compra con el reloj de la aplicación
+  async presentar(compra) {
+    return compra.aJSON(this._reloj());
+  }
+
   _validarEstado(estado) {
     if (estado !== undefined && !esEstadoCompraValido(estado)) {
       throw new ValidationError(`El estado ${estado} no existe. Opciones: ${Object.values(EstadoCompra).join(", ")}`);
