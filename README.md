@@ -1,131 +1,154 @@
 # AI Ticket It
 
-Plataforma de publicación de eventos y venta de entradas. Trabajo Práctico Individual de **Desarrollo con Inteligencia Artificial** de la materia **Desarrollo de Software (DDS)**, UTN FRBA, 2C 2026.
+Plataforma de publicación de eventos y venta de entradas. Trabajo Práctico Individual de Desarrollo con Inteligencia Artificial, Desarrollo de Software, UTN FRBA, 2C 2026.
 
-Los organizadores publican eventos con distintos tipos de entrada (precio y cupo) y siguen sus ventas; los compradores exploran el catálogo, compran, siguen el estado de cada compra, chatean con el organizador y reseñan los eventos a los que fueron.
+- `packages/backend`: API REST con Node + Express y persistencia en memoria.
+- `packages/mobile`: app React Native con Expo (SDK 58).
 
-## 📦 Estructura del proyecto
+Esta guía explica cómo levantarlo en la PC y en el celular, con qué usuarios entrar y cómo probar cada caso de uso.
 
-Monorepo con **npm workspaces**:
+## 1. Antes de empezar (una sola vez)
 
-```
-.
-├── packages/
-│   ├── backend/   # API REST con Node + Express, persistencia en memoria
-│   └── mobile/    # App React Native con Expo (SDK 58) y Expo Router
-├── package.json   # Scripts del monorepo
-└── README.md
-```
+1. **Node 22 o superior.** Revisalo con:
 
-### Backend (`packages/backend`)
+   ```bash
+   node -v
+   ```
 
-Arquitectura en capas, igual que en el TP de la materia:
+2. **Expo Go** en el celular, actualizada a la última versión (App Store o Play Store).
+3. **Cuenta de Expo** (gratis, en [expo.dev/signup](https://expo.dev/signup)). En iPhone es obligatoria: tenés que iniciar sesión con la misma cuenta en la PC y en Expo Go. En la PC:
 
-| Capa         | Carpeta                                 | Responsabilidad                                                                                                                                                              |
-| ------------ | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dominio      | `domain/`                               | Reglas del negocio: `Evento`, `TipoEntrada`, `Compra`, `EstadoCompra`, `CambioEstadoCompra`, `Mensaje`, `Resenia`, `Usuario`, `Categoria` (diagrama de clases del enunciado) |
-| Repositorios | `repository/`                           | Persistencia **en memoria** (`RepositorioEnMemoria`), con métodos async como si hubiera una base                                                                             |
-| Servicios    | `services/`                             | Casos de uso: buscan en los repositorios, delegan en el dominio y guardan                                                                                                    |
-| Controllers  | `controllers/`                          | Leen la request, validan la forma del body y responden                                                                                                                       |
-| Rutas        | `routes/`                               | Asocian cada endpoint con su controller                                                                                                                                      |
-| Errores      | `errors/`, `middleware/errorHandler.js` | `AppError` y subclases (400, 401, 403, 404, 409, 422) que el manejador traduce a la respuesta HTTP                                                                           |
+   ```bash
+   npx expo login
+   ```
 
-- **Express 5**: los errores que se lanzan en un controller async llegan solos al `errorHandler`.
-- **Autenticación**: login con email y contraseña (hasheada con `scrypt` de Node). El login devuelve un token que la app manda en `Authorization: Bearer <token>`.
-- **Swagger**: con el backend levantado, la documentación interactiva está en `http://localhost:8000/api-docs`. Cada recurso tiene su YAML en `packages/backend/docs`.
-- **Tests** con Jest y Supertest: dominio, repositorios, servicios y API (`npm test`).
-- **Datos de prueba**: al arrancar se cargan usuarios, eventos y compras en todos los estados, con fechas relativas al día de hoy (hay un evento que es hoy, para poder validar entradas, y eventos pasados con reseñas).
+4. **Dependencias**, desde la carpeta del proyecto:
 
-### Mobile (`packages/mobile`)
+   ```bash
+   cd C:\Estudio\DDS\ai-ticket-it
+   npm install
+   ```
 
-App con Expo Router: pestañas nativas (Explorar, Mis compras, Mis eventos, Perfil) y pantallas apiladas para el detalle del evento, la compra, el chat y la creación de eventos. Está escrita en TypeScript. Ver [`packages/mobile/README.md`](packages/mobile/README.md).
+## 2. Levantar el backend
 
-## 🚀 Cómo levantarlo
-
-Requisitos: Node 22 o superior (probado con Node 24), y la app **Expo Go** en el celular (Android o iOS). El celular y la computadora tienen que estar en la **misma red Wi-Fi**.
-
-```bash
-npm install
-```
-
-En una terminal, el backend (puerto 8000):
+En una terminal, desde `C:\Estudio\DDS\ai-ticket-it`:
 
 ```bash
 npm run dev:backend
 ```
 
-En otra terminal, la app:
+Tiene que decir `Backend escuchando en puerto 8000 (con datos de prueba)`. Dejá esa terminal abierta.
 
-```bash
-npm run start:mobile
-```
+- Si Windows pregunta por el **firewall**, marcá **Redes privadas** y aceptá. Si no, el celular no va a poder conectarse.
+- Para comprobar que anda, abrí en el navegador de la PC:
+  - http://localhost:8000/health → tiene que responder `{"status":"ok"}`.
+  - http://localhost:8000/api-docs → documentación de la API (Swagger), donde también se pueden probar los endpoints.
 
-Escaneá el QR con Expo Go (Android) o con la cámara (iOS). La app encuentra sola el backend usando la misma IP con la que Expo sirve la app.
+Los datos viven en memoria: cada vez que reiniciás el backend se borra lo que hiciste y se vuelven a cargar los datos de prueba (y hay que volver a iniciar sesión en la app).
 
-> **Si la app no llega al backend** (el perfil muestra a qué URL apunta):
->
-> - Permití Node.js en el firewall de Windows para redes privadas (puerto 8000).
-> - Si la computadora tiene varias placas de red (por ejemplo VirtualBox), Expo puede elegir una IP equivocada. Forzá la correcta:
->   `set REACT_NATIVE_PACKAGER_HOSTNAME=192.168.0.10` antes de `npm run start:mobile`, o indicá la URL del backend con `EXPO_PUBLIC_API_URL=http://192.168.0.10:8000` en `packages/mobile/.env`.
+## 3. Probarlo en el celular
 
-Todos los scripts del monorepo:
+1. **Averiguá la IP de tu PC.** En PowerShell:
 
-| Script                 | Qué hace                       |
-| ---------------------- | ------------------------------ |
-| `npm run dev:backend`  | Backend con recarga automática |
-| `npm run start:mobile` | Servidor de Expo               |
-| `npm run start:dev`    | Los dos juntos                 |
-| `npm test`             | Tests del backend              |
-| `npm run lint`         | ESLint del backend             |
-| `npm run typecheck`    | Chequeo de tipos de la app     |
-| `npm run format`       | Prettier en todo el repo       |
+   ```powershell
+   ipconfig
+   ```
 
-Con `DATOS_DE_PRUEBA=false` el backend arranca vacío (sólo con las categorías).
+   Usá la "Dirección IPv4" de tu Wi-Fi (por ejemplo `192.168.0.29`). Ignorá la `192.168.56.1`: es de VirtualBox.
 
-## 👤 Usuarios de prueba
+2. **Comprobá que el celular llega al backend.** Con el celular en la **misma red Wi-Fi**, abrí en su navegador `http://<IP-de-tu-PC>:8000/health`. Si no carga, revisá el firewall (paso 2) y no sigas hasta que funcione.
 
-Todos con la contraseña `123456`. En la pantalla de login se pueden tocar para completar los datos.
+3. **Levantá la app.** En otra terminal de PowerShell (la del backend sigue abierta), poniendo tu IP:
 
-| Email                        | Rol en los datos de prueba                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------ |
-| `comprador@aiticketit.com`   | Lucía, con compras en todos los estados y una compra utilizada sin reseñar     |
-| `organizador@aiticketit.com` | Martín, organiza Jazz, Rock, el Stand up de hoy y un evento pasado con reseñas |
-| `productora@aiticketit.com`  | Carla, organiza Hamlet, una conferencia, un festival y un partido              |
-| `tomas@aiticketit.com`       | Tomás, otro comprador                                                          |
+   ```powershell
+   cd C:\Estudio\DDS\ai-ticket-it
+   $env:REACT_NATIVE_PACKAGER_HOSTNAME="192.168.0.29"
+   npm run start:mobile
+   ```
 
-Un mismo usuario puede comprar y organizar: no hay roles separados, el organizador de un evento es quien lo creó.
+   La segunda línea fuerza la IP del Wi-Fi para que Expo no use la de VirtualBox. En CMD sería `set REACT_NATIVE_PACKAGER_HOSTNAME=192.168.0.29`.
 
-## ✅ Casos de uso
+4. **Abrí la app.** Con la cuenta de Expo iniciada en los dos lados, el proyecto aparece en Expo Go, en **Development servers**. Si no aparece, escaneá el QR con la cámara (iPhone) o con Expo Go (Android).
 
-| Caso de uso                                                                                   | En la app                                             | Endpoint                         |
-| --------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------- |
-| Ver mis compras con su estado y los días que faltan si está confirmada                        | Pestaña **Mis compras** (filtro por estado) → detalle | `GET /compras`                   |
-| Ver las compras de un evento por estado y las entradas que quedan de cada tipo                | **Mis eventos** → un evento                           | `GET /eventos/:id/compras`       |
-| Buscar eventos por texto o explorarlos por categoría                                          | Pestaña **Explorar**                                  | `GET /eventos?q=&categoriaId=`   |
-| Ordenar por precio, fecha del evento y puntaje del organizador                                | **Explorar** → "Ordenar por"                          | `GET /eventos?orden=&direccion=` |
-| Crear un evento con varios tipos de entrada, cada uno con precio y cupo                       | **Mis eventos** → "+ Crear"                           | `POST /eventos`                  |
-| Comprar eligiendo tipo de entrada y cantidad, sin superar el cupo                             | Detalle del evento                                    | `POST /compras`                  |
-| Chat de la compra (comprador y organizador, en cualquier momento)                             | Detalle de la compra → "Chatear"                      | `GET/POST /compras/:id/mensajes` |
-| Cancelar una compra para obtener el reembolso, si no está utilizada y el evento no se realizó | Detalle de la compra                                  | `POST /compras/:id/cancelacion`  |
-| Puntuar el evento y comentar una vez utilizada la entrada                                     | Detalle de una compra utilizada                       | `POST /compras/:id/resenia`      |
-| Ver las reseñas de eventos anteriores del organizador antes de comprar                        | Detalle del evento                                    | `GET /eventos/:id`               |
+5. **Comprobá la conexión.** Iniciá sesión y andá a la pestaña **Perfil**: abajo tiene que decir `Servidor: http://<IP-de-tu-PC>:8000`.
 
-Además: pagar una compra pendiente (pago simulado, `POST /compras/:id/pago`), validar una entrada en el acceso el día del evento (`POST /compras/:id/uso`) y guardar eventos favoritos (`PUT/DELETE /eventos/:id/favorito`).
+## 4. Probarlo en la PC (navegador)
 
-### Estados de una compra
+Con `npm run start:mobile` corriendo, apretá **`w`** en esa terminal y se abre la app en el navegador. Para verla como en un celular: `F12` y después el ícono de celular (`Ctrl + Shift + M`).
 
-```
-PENDIENTE ──pagar──▶ CONFIRMADA ──validar en el acceso──▶ UTILIZADA ──▶ (se puede reseñar)
-    │                    │
- cancelar             cancelar
-    ▼                    ▼
-CANCELADA            CANCELADA ──▶ REEMBOLSADA
-```
+En el navegador las pestañas aparecen arriba en vez de abajo, y si recargás la página tenés que volver a iniciar sesión.
 
-Cada cambio queda registrado como un `CambioEstadoCompra` (estado, quién y cuándo), que la app muestra como historial. Al cancelar se libera el cupo.
+## 5. Usuarios de prueba
 
-Una compra pendiente tiene **24 horas para pagarse** (se configura con `PLAZO_PARA_PAGAR_MINUTOS`); si no, el servidor la cancela sola y libera el cupo. La app muestra hasta cuándo se puede pagar. Además, cada compra tiene un máximo de 10 entradas.
+Todos con la contraseña **`123456`**. En la pantalla de login, tocando el email de un usuario se completan los datos solos.
 
-## 🤖 Uso de IA
+| Email                        | Quién es         | Qué tiene cargado                                                                                             |
+| ---------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `comprador@aiticketit.com`   | Lucía Gómez      | Compras en todos los estados (detalle abajo)                                                                  |
+| `organizador@aiticketit.com` | Martín Rodríguez | Organiza Noche de Jazz, Rock en el Galpón, el Stand up de hoy y Tango bajo las estrellas (ya pasó)            |
+| `productora@aiticketit.com`  | Carla Fernández  | Organiza Hamlet, la conferencia de IA, Festival Río Sonoro, la final de básquet y Monólogos del Sur (ya pasó) |
+| `tomas@aiticketit.com`       | Tomás Ibarra     | Compras confirmadas para Jazz y el Stand up de hoy; reseñó Tango y Monólogos                                  |
 
-El proyecto se desarrolló con herramientas de inteligencia artificial como apoyo principal, partiendo del enunciado y del diagrama de clases, y siguiendo la arquitectura y convenciones vistas en la materia. Cada funcionalidad quedó en un commit separado para poder revisarla de a una.
+Las compras de Lucía:
+
+| Evento                          | Estado                      | Para probar                                                |
+| ------------------------------- | --------------------------- | ---------------------------------------------------------- |
+| Noche de Jazz en San Telmo      | Confirmada (faltan 12 días) | Días que faltan, chat con mensajes, cancelar con reembolso |
+| Rock en el Galpón               | Pendiente de pago           | Pagar, y el plazo para pagar (24 horas)                    |
+| Stand up: Risas de Viernes      | Confirmada (es hoy)         | Que el organizador valide la entrada                       |
+| Hamlet                          | Reembolsada                 | Historial de estados                                       |
+| IA en el desarrollo de software | Cancelada                   | Compra cancelada sin pagar                                 |
+| Tango bajo las estrellas        | Utilizada, ya reseñada      | Ver una reseña hecha                                       |
+| Monólogos del Sur               | Utilizada, sin reseñar      | Dejar una reseña                                           |
+
+Cualquier usuario puede comprar y también publicar eventos.
+
+## 6. Recorrido para probar todos los casos de uso
+
+**Como compradora** (`comprador@aiticketit.com`):
+
+- [ ] **Buscar y explorar**: en **Explorar**, buscá "musica" (sin tilde), filtrá por una categoría y ordená por Fecha, Precio y Puntaje (con la flecha cambiás el sentido).
+- [ ] **Reseñas del organizador**: entrá a un evento de Martín y bajá hasta sus reseñas.
+- [ ] **Comprar sin superar el cupo**: en **Rock en el Galpón** elegí **VIP**. Quedan 2, así que el botón `+` no deja pasar de 2. En otros tipos el tope es 10 por compra.
+- [ ] **Favoritos**: tocá el ♡ arriba a la derecha de un evento y fijate que aparezca en **Perfil**.
+- [ ] **Mis compras**: revisá los colores de cada estado, filtrá por estado y fijate en "Faltan N días" de las confirmadas.
+- [ ] **Pagar**: abrí la compra pendiente de Rock, fijate hasta cuándo se puede pagar y tocá **Pagar**. Pasa a Confirmada y aparece "Faltan N días".
+- [ ] **Chat**: en la compra de Jazz, tocá **Chatear con el organizador** y mandá un mensaje.
+- [ ] **Cancelar con reembolso**: en la compra de Jazz, tocá **Cancelar y pedir reembolso**. Queda Reembolsada y en el historial aparecen los dos pasos.
+- [ ] **Reseñar**: en **Monólogos del Sur** elegí las estrellas, escribí un comentario y publicá.
+- [ ] **No se puede cancelar una utilizada**: en Tango o Monólogos no aparece el botón de cancelar.
+
+**Como organizador** (`organizador@aiticketit.com`; antes, **Perfil → Cerrar sesión**):
+
+- [ ] **Compras de un evento**: en **Mis eventos** tocá **Stand up: Risas de Viernes**. Vas a ver las compras por estado y cuántas entradas quedan de cada tipo.
+- [ ] **Validar una entrada**: abrí la compra de Lucía del Stand up y tocá **Validar entrada**. Queda Utilizada.
+- [ ] **Responder el chat**: en **Mis eventos → Noche de Jazz**, abrí la compra de Lucía, entrá al chat y respondé.
+- [ ] **Crear un evento**: en **Mis eventos** tocá **+ Crear**. Completá nombre, descripción, categoría, una fecha futura (`AAAA-MM-DD`), la hora y al menos dos tipos de entrada con precio y cupo. Después buscalo en **Explorar**.
+- [ ] **No podés comprar tu propio evento**: en el detalle de un evento tuyo no aparece la compra, sino "Ver compras del evento".
+
+Con dos celulares (o celular y navegador), uno con cada usuario, se ve el chat en vivo: los mensajes nuevos llegan solos cada 5 segundos.
+
+## 7. Si algo no funciona
+
+| Problema                                                   | Solución                                                                        |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| "No se pudo conectar con el servidor"                      | Revisá que el backend esté corriendo, el firewall (paso 2) y la IP (paso 3).    |
+| La app te devuelve al login                                | Se reinició el backend (o pasaron 12 horas): iniciá sesión de nuevo.            |
+| iPhone: "You need to be signed in to Expo Go and Expo CLI" | Corré `npx expo login` en la PC e iniciá sesión con la misma cuenta en Expo Go. |
+| "Port 8081 is being used"                                  | Respondé `Y` para usar otro puerto, o cerrá el otro proyecto de Expo.           |
+| Expo Go dice que el SDK no es compatible                   | Actualizá Expo Go.                                                              |
+| Hiciste cambios en el código y no se ven                   | En la terminal de Expo apretá `r` para recargar.                                |
+
+## 8. Otros comandos
+
+| Comando             | Qué hace                                  |
+| ------------------- | ----------------------------------------- |
+| `npm test`          | Tests del backend                         |
+| `npm run lint`      | Revisa el código del backend              |
+| `npm run typecheck` | Revisa los tipos de la app                |
+| `npm run start:dev` | Backend y app juntos en una sola terminal |
+
+Variables opcionales del backend, en `packages/backend/.env` (hay un ejemplo en `.env.example`):
+
+- `DATOS_DE_PRUEBA=false` → arranca vacío, sólo con las categorías.
+- `PLAZO_PARA_PAGAR_MINUTOS` → minutos para pagar una compra antes de que se cancele sola (por defecto 1440, o sea 24 horas).
