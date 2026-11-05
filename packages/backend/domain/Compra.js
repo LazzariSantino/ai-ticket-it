@@ -7,6 +7,9 @@ import { Resenia } from "./Resenia.js";
 
 const MILISEGUNDOS_POR_DIA = 24 * 60 * 60 * 1000;
 
+// Tope por compra: evita que una sola compra (aunque esté sin pagar) reserve todo el cupo de un evento
+export const MAXIMO_ENTRADAS_POR_COMPRA = 10;
+
 function inicioDelDia(fecha) {
   const inicio = new Date(fecha);
   inicio.setHours(0, 0, 0, 0);
@@ -33,6 +36,11 @@ export class Compra {
   static realizar({ comprador, evento, tipoEntradaId, cantidad, ahora = new Date() }) {
     if (!Number.isInteger(cantidad) || cantidad <= 0) {
       throw new UnprocessableEntityError("La cantidad de entradas debe ser un número entero mayor a 0");
+    }
+    if (cantidad > MAXIMO_ENTRADAS_POR_COMPRA) {
+      throw new UnprocessableEntityError(
+        `No se pueden comprar más de ${MAXIMO_ENTRADAS_POR_COMPRA} entradas por compra`,
+      );
     }
     if (evento.yaSeRealizo(ahora)) {
       throw new UnprocessableEntityError("No se pueden comprar entradas para un evento que ya se realizó");

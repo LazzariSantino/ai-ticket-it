@@ -57,6 +57,11 @@ describe("Dominio: Compra", () => {
       expect(() => comprar(1.5)).toThrow(UnprocessableEntityError);
     });
 
+    it("error si se piden más de 10 entradas en una compra, aunque haya cupo", () => {
+      expect(() => comprar(11, 1)).toThrow("No se pueden comprar más de 10 entradas por compra");
+      expect(evento.tiposEntrada[0].cupo).toBe(5);
+    });
+
     it("error si se supera el cupo disponible del tipo elegido", () => {
       expect(() => comprar(3, 2)).toThrow("No hay cupo suficiente para 3 entradas VIP: quedan 2");
       expect(evento.tiposEntrada[1].cupo).toBe(2);

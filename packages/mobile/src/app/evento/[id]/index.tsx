@@ -19,6 +19,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useSesion } from "@/sesion/sesion-context";
 import { formatearFecha, formatearPrecio } from "@/utils/formato";
 
+// El mismo tope que valida el backend (MAXIMO_ENTRADAS_POR_COMPRA)
 const MAXIMO_POR_COMPRA = 10;
 
 export default function EventoScreen() {
