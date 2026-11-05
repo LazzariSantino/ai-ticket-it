@@ -29,8 +29,10 @@ export default function EventoScreen() {
   const { actualizarUsuario } = useSesion();
   const { datos: evento, setDatos, error, cargando, recargar } = useConsulta(() => obtenerEvento(id), [id]);
 
-  const [tipoElegido, setTipoElegido] = useState<TipoEntrada | null>(null);
-  const [cantidad, setCantidad] = useState(1);
+  // Se guarda el id y no el tipo: así, si se recarga el evento (por ejemplo, después de una compra fallida),
+  // el cupo disponible que se usa es el actualizado y no una copia vieja
+  const [tipoElegidoId, setTipoElegidoId] = useState<number | null>(null);
+  const [cantidadElegida, setCantidad] = useState(1);
   const [comprando, setComprando] = useState(false);
   const [errorCompra, setErrorCompra] = useState<string | null>(null);
   const [guardandoFavorito, setGuardandoFavorito] = useState(false);
@@ -39,10 +41,13 @@ export default function EventoScreen() {
   if (cargando) return <Cargando />;
   if (error || !evento) return <ErrorPantalla mensaje={error ?? "No se encontró el evento"} onReintentar={recargar} />;
 
+  // Si el tipo elegido se agotó mientras tanto, deja de estar elegido
+  const tipoElegido = evento.tiposEntrada.find((tipo) => tipo.id === tipoElegidoId && tipo.cupoDisponible > 0) ?? null;
   const maximo = Math.min(tipoElegido?.cupoDisponible ?? 0, MAXIMO_POR_COMPRA);
+  const cantidad = Math.max(1, Math.min(cantidadElegida, maximo));
 
   function elegirTipo(tipo: TipoEntrada) {
-    setTipoElegido(tipo);
+    setTipoElegidoId(tipo.id);
     setCantidad(1);
     setErrorCompra(null);
   }
