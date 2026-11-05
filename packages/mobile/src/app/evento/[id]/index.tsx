@@ -33,6 +33,8 @@ export default function EventoScreen() {
   const [cantidad, setCantidad] = useState(1);
   const [comprando, setComprando] = useState(false);
   const [errorCompra, setErrorCompra] = useState<string | null>(null);
+  const [guardandoFavorito, setGuardandoFavorito] = useState(false);
+  const [errorFavorito, setErrorFavorito] = useState<string | null>(null);
 
   if (cargando) return <Cargando />;
   if (error || !evento) return <ErrorPantalla mensaje={error ?? "No se encontró el evento"} onReintentar={recargar} />;
@@ -46,10 +48,18 @@ export default function EventoScreen() {
   }
 
   async function alternarFavorito() {
-    if (!evento) return;
-    const usuario = evento.esFavorito ? await quitarFavorito(evento.id) : await agregarFavorito(evento.id);
-    actualizarUsuario(usuario);
-    setDatos({ ...evento, esFavorito: !evento.esFavorito });
+    if (!evento || guardandoFavorito) return;
+    setGuardandoFavorito(true);
+    setErrorFavorito(null);
+    try {
+      const usuario = evento.esFavorito ? await quitarFavorito(evento.id) : await agregarFavorito(evento.id);
+      actualizarUsuario(usuario);
+      setDatos({ ...evento, esFavorito: !evento.esFavorito });
+    } catch (e) {
+      setErrorFavorito(e instanceof Error ? e.message : "No se pudo actualizar el favorito");
+    } finally {
+      setGuardandoFavorito(false);
+    }
   }
 
   async function confirmarCompra() {
@@ -95,6 +105,11 @@ export default function EventoScreen() {
             {evento.categoria.nombre.toUpperCase()} · {formatearFecha(evento.fecha)}
           </ThemedText>
           <ThemedText type="title">{evento.nombre}</ThemedText>
+          {errorFavorito && (
+            <ThemedText type="small" themeColor="peligro">
+              {errorFavorito}
+            </ThemedText>
+          )}
           <ThemedText>{evento.descripcion}</ThemedText>
 
           <Tarjeta titulo="Organiza">
