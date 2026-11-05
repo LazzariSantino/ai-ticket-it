@@ -149,7 +149,8 @@ export async function cargarDatosDePrueba(
     haceUnRato,
   );
 
-  await comprar(lucia, rock, 3, 1, haceUnRato);
+  // Pendiente de pago, hecha al arrancar el servidor: tiene todo el plazo para pagar por delante
+  await comprar(lucia, rock, 3, 1, ahora);
 
   const hamletLucia = await comprar(lucia, hamlet, 1, 2, enDias(-3, 12));
   hamletLucia.pagar(lucia, enDias(-3, 12));

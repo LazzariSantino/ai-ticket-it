@@ -28,8 +28,14 @@ import { ReseniaRepository } from "./repository/Resenia.repository.js";
 import { CompraRepository } from "./repository/Compra.repository.js";
 
 // Arma la aplicación sin levantar el servidor, así los tests pueden crear una instancia nueva cada vez.
-// `reloj` permite fijar "el momento actual" en los tests.
-export async function crearApp({ reloj = () => new Date(), conDatosDePrueba = false } = {}) {
+// `reloj` permite fijar "el momento actual" en los tests. Con `vencerPendientesCadaMs` se revisa cada ese tiempo
+// si hay compras sin pagar fuera de plazo (los tests no lo activan: llaman al service cuando lo necesitan).
+export async function crearApp({
+  reloj = () => new Date(),
+  conDatosDePrueba = false,
+  plazoParaPagarEnMinutos,
+  vencerPendientesCadaMs,
+} = {}) {
   const app = express();
   app.use(express.json());
   app.use(
@@ -58,7 +64,13 @@ export async function crearApp({ reloj = () => new Date(), conDatosDePrueba = fa
   const categoriaService = new CategoriaService(categoriaRepository);
   await categoriaService.cargarCategoriasIniciales();
   const eventoService = new EventoService(eventoRepository, categoriaRepository, reseniaRepository, reloj);
-  const compraService = new CompraService(compraRepository, eventoService, reseniaRepository, reloj);
+  const compraService = new CompraService(
+    compraRepository,
+    eventoService,
+    reseniaRepository,
+    reloj,
+    plazoParaPagarEnMinutos,
+  );
 
   if (conDatosDePrueba) {
     await cargarDatosDePrueba(
@@ -83,6 +95,16 @@ export async function crearApp({ reloj = () => new Date(), conDatosDePrueba = fa
 
   // Manejo de errores
   app.use(errorHandler);
+
+  if (vencerPendientesCadaMs) {
+    const intervalo = setInterval(() => {
+      compraService
+        .vencerComprasPendientes()
+        .then((cantidad) => cantidad > 0 && console.log(`Se vencieron ${cantidad} compra(s) sin pagar`))
+        .catch((error) => console.error("Error al vencer compras pendientes:", error));
+    }, vencerPendientesCadaMs);
+    intervalo.unref();
+  }
 
   return app;
 }

@@ -10,6 +10,9 @@ const MILISEGUNDOS_POR_DIA = 24 * 60 * 60 * 1000;
 // Tope por compra: evita que una sola compra (aunque esté sin pagar) reserve todo el cupo de un evento
 export const MAXIMO_ENTRADAS_POR_COMPRA = 10;
 
+// Si una compra no se paga dentro de este plazo se cancela sola y su cupo vuelve a estar a la venta
+export const PLAZO_PARA_PAGAR_POR_DEFECTO_MINUTOS = 24 * 60;
+
 function inicioDelDia(fecha) {
   const inicio = new Date(fecha);
   inicio.setHours(0, 0, 0, 0);
@@ -17,13 +20,21 @@ function inicioDelDia(fecha) {
 }
 
 export class Compra {
-  constructor({ comprador, evento, tipoEntrada, cantidad, fecha = new Date() }) {
+  constructor({
+    comprador,
+    evento,
+    tipoEntrada,
+    cantidad,
+    fecha = new Date(),
+    plazoParaPagarEnMinutos = PLAZO_PARA_PAGAR_POR_DEFECTO_MINUTOS,
+  }) {
     this.comprador = comprador;
     this.evento = evento;
     this.tipoEntrada = tipoEntrada;
     this.cantidad = cantidad;
     this.total = tipoEntrada.precio * cantidad;
     this.fecha = fecha;
+    this.venceElPago = new Date(fecha.getTime() + plazoParaPagarEnMinutos * 60 * 1000);
     this.estado = EstadoCompra.PENDIENTE;
     this.mensajes = [];
     this.resenia = null;
@@ -33,7 +44,7 @@ export class Compra {
   }
 
   // Valida las reglas de la compra y reserva el cupo. La compra queda pendiente de pago.
-  static realizar({ comprador, evento, tipoEntradaId, cantidad, ahora = new Date() }) {
+  static realizar({ comprador, evento, tipoEntradaId, cantidad, ahora = new Date(), plazoParaPagarEnMinutos }) {
     if (!Number.isInteger(cantidad) || cantidad <= 0) {
       throw new UnprocessableEntityError("La cantidad de entradas debe ser un número entero mayor a 0");
     }
@@ -54,7 +65,7 @@ export class Compra {
     }
 
     tipoEntrada.reservar(cantidad);
-    return new Compra({ comprador, evento, tipoEntrada, cantidad, fecha: ahora });
+    return new Compra({ comprador, evento, tipoEntrada, cantidad, fecha: ahora, plazoParaPagarEnMinutos });
   }
 
   actualizarEstado(estadoNuevo, quien, fechaHora = new Date()) {
@@ -81,7 +92,23 @@ export class Compra {
     if (this.evento.yaSeRealizo(ahora)) {
       throw new UnprocessableEntityError("No se puede pagar una compra de un evento que ya se realizó");
     }
+    if (this.estaVencida(ahora)) {
+      throw new UnprocessableEntityError("Venció el plazo para pagar esta compra");
+    }
     this.actualizarEstado(EstadoCompra.CONFIRMADA, quien, ahora);
+  }
+
+  estaVencida(ahora = new Date()) {
+    return this.estado === EstadoCompra.PENDIENTE && ahora >= this.venceElPago;
+  }
+
+  // La cancela el sistema (quien = null) cuando no se pagó a tiempo, y devuelve el cupo reservado
+  vencer(ahora = new Date()) {
+    if (!this.estaVencida(ahora)) {
+      throw new UnprocessableEntityError("La compra no está vencida");
+    }
+    this.actualizarEstado(EstadoCompra.CANCELADA, null, ahora);
+    this.tipoEntrada.liberar(this.cantidad);
   }
 
   // Se puede cancelar mientras no esté utilizada (ni ya cancelada) y el evento no se haya realizado
@@ -175,6 +202,7 @@ export class Compra {
       total: this.total,
       fecha: this.fecha,
       estado: this.estado,
+      venceElPago: this.estado === EstadoCompra.PENDIENTE ? this.venceElPago : null,
       diasParaEvento: this.diasParaEvento(ahora),
       puedeCancelarse: this.puedeCancelarse(ahora),
       cantidadMensajes: this.mensajes.length,

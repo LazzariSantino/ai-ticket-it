@@ -200,4 +200,27 @@ describe("CompraService", () => {
       expect(await reseniaRepository.buscarTodos()).toEqual([]);
     });
   });
+
+  describe("vencerComprasPendientes", () => {
+    it("cancela sólo las pendientes fuera de plazo y devuelve el cupo al evento", async () => {
+      const sinPagar = await comprar(3);
+      const pagada = await comprar(2);
+      await service.pagar(compradora, pagada.id);
+      ahora = new Date("2026-11-02T12:00:00.000Z"); // 24 horas después
+
+      const cantidad = await service.vencerComprasPendientes();
+
+      expect(cantidad).toBe(1);
+      expect(sinPagar.estado).toBe(EstadoCompra.CANCELADA);
+      expect(pagada.estado).toBe(EstadoCompra.CONFIRMADA);
+      expect(sinPagar.tipoEntrada.cupo).toBe(98);
+    });
+
+    it("no hace nada mientras las compras estén dentro del plazo", async () => {
+      await comprar();
+      ahora = new Date("2026-11-02T11:59:00.000Z");
+
+      expect(await service.vencerComprasPendientes()).toBe(0);
+    });
+  });
 });

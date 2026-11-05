@@ -1,4 +1,5 @@
-// Registro histórico de cada etapa por la que pasa una compra: qué estado, quién lo provocó y cuándo
+// Registro histórico de cada etapa por la que pasa una compra: qué estado, quién lo provocó y cuándo.
+// quien = null cuando el cambio lo hizo el sistema (por ejemplo, al vencer el plazo para pagar).
 export class CambioEstadoCompra {
   constructor({ compra, estado, quien, fechaHora = new Date() }) {
     this.compra = compra;
@@ -8,6 +9,6 @@ export class CambioEstadoCompra {
   }
 
   toJSON() {
-    return { estado: this.estado, quien: this.quien.resumen(), fechaHora: this.fechaHora };
+    return { estado: this.estado, quien: this.quien?.resumen() ?? null, fechaHora: this.fechaHora };
   }
 }

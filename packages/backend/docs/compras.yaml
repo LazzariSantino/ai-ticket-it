@@ -280,7 +280,11 @@ components:
       type: object
       properties:
         estado: { $ref: "#/components/schemas/EstadoCompra" }
-        quien: { $ref: "#/components/schemas/UsuarioResumen" }
+        quien:
+          description: Quién hizo el cambio. Es null si lo hizo el sistema (venció el plazo para pagar).
+          allOf:
+            - $ref: "#/components/schemas/UsuarioResumen"
+          nullable: true
         fechaHora: { type: string, format: date-time }
     Compra:
       type: object
@@ -305,6 +309,13 @@ components:
         total: { type: number, example: 30000 }
         fecha: { type: string, format: date-time, description: Cuándo se hizo la compra }
         estado: { $ref: "#/components/schemas/EstadoCompra" }
+        venceElPago:
+          type: string
+          format: date-time
+          nullable: true
+          description: >-
+            Sólo para compras pendientes: hasta cuándo se puede pagar. Pasado ese momento la compra se cancela sola
+            y su cupo vuelve a estar a la venta (por defecto, 24 horas después de comprar).
         diasParaEvento:
           type: integer
           nullable: true

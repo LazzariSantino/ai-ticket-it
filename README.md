@@ -124,6 +124,8 @@ CANCELADA            CANCELADA ──▶ REEMBOLSADA
 
 Cada cambio queda registrado como un `CambioEstadoCompra` (estado, quién y cuándo), que la app muestra como historial. Al cancelar se libera el cupo.
 
+Una compra pendiente tiene **24 horas para pagarse** (se configura con `PLAZO_PARA_PAGAR_MINUTOS`); si no, el servidor la cancela sola y libera el cupo. La app muestra hasta cuándo se puede pagar. Además, cada compra tiene un máximo de 10 entradas.
+
 ## 🤖 Uso de IA
 
 El proyecto se desarrolló con herramientas de inteligencia artificial como apoyo principal, partiendo del enunciado y del diagrama de clases, y siguiendo la arquitectura y convenciones vistas en la materia. Cada funcionalidad quedó en un commit separado para poder revisarla de a una.

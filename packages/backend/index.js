@@ -3,7 +3,9 @@ import { crearApp } from "./app.js";
 
 // Con DATOS_DE_PRUEBA=false arranca vacío (sólo con las categorías)
 const conDatosDePrueba = process.env.DATOS_DE_PRUEBA !== "false";
-const app = await crearApp({ conDatosDePrueba });
+// Plazo para pagar una compra antes de que se cancele sola (por defecto, 24 horas)
+const plazoParaPagarEnMinutos = Number(process.env.PLAZO_PARA_PAGAR_MINUTOS) || undefined;
+const app = await crearApp({ conDatosDePrueba, plazoParaPagarEnMinutos, vencerPendientesCadaMs: 60 * 1000 });
 
 // 0.0.0.0 para que el celular pueda llegar al backend por la red local
 const PORT = process.env.SERVER_PORT || process.env.PORT || 8000;

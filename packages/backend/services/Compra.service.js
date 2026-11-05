@@ -1,12 +1,19 @@
-import { Compra } from "../domain/Compra.js";
+import { Compra, PLAZO_PARA_PAGAR_POR_DEFECTO_MINUTOS } from "../domain/Compra.js";
 import { EstadoCompra, esEstadoCompraValido } from "../domain/EstadoCompra.js";
 import { ForbiddenError } from "../errors/ForbiddenError.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
 import { ValidationError } from "../errors/ValidationError.js";
 
 export class CompraService {
-  constructor(compraRepository, eventoService, reseniaRepository, reloj = () => new Date()) {
+  constructor(
+    compraRepository,
+    eventoService,
+    reseniaRepository,
+    reloj = () => new Date(),
+    plazoParaPagarEnMinutos = PLAZO_PARA_PAGAR_POR_DEFECTO_MINUTOS,
+  ) {
     this._compraRepository = compraRepository;
+    this._plazoParaPagarEnMinutos = plazoParaPagarEnMinutos;
     this._eventoService = eventoService;
     this._reseniaRepository = reseniaRepository;
     this._reloj = reloj;
@@ -14,7 +21,14 @@ export class CompraService {
 
   async comprar(comprador, { eventoId, tipoEntradaId, cantidad }) {
     const evento = await this._eventoService.buscarEventoExistente(eventoId);
-    const compra = Compra.realizar({ comprador, evento, tipoEntradaId, cantidad, ahora: this._reloj() });
+    const compra = Compra.realizar({
+      comprador,
+      evento,
+      tipoEntradaId,
+      cantidad,
+      ahora: this._reloj(),
+      plazoParaPagarEnMinutos: this._plazoParaPagarEnMinutos,
+    });
     return await this._compraRepository.guardar(compra);
   }
 
@@ -93,6 +107,17 @@ export class CompraService {
     await this._reseniaRepository.guardar(resenia);
     await this._compraRepository.guardar(compra);
     return resenia;
+  }
+
+  // Cancela las compras que no se pagaron a tiempo y libera su cupo. Lo ejecuta periódicamente el servidor.
+  async vencerComprasPendientes() {
+    const ahora = this._reloj();
+    const vencidas = await this._compraRepository.buscarPendientesVencidas(ahora);
+    for (const compra of vencidas) {
+      compra.vencer(ahora);
+      await this._compraRepository.guardar(compra);
+    }
+    return vencidas.length;
   }
 
   // Arma la respuesta de una compra con el reloj de la aplicación

@@ -219,6 +219,53 @@ describe("Dominio: Compra", () => {
     });
   });
 
+  describe("plazo para pagar", () => {
+    const enHoras = (horas) => new Date(antesDelEvento.getTime() + horas * 60 * 60 * 1000);
+
+    it("por defecto vence 24 horas después de la compra", () => {
+      expect(comprar().venceElPago).toEqual(enHoras(24));
+    });
+
+    it("el plazo se puede configurar", () => {
+      const compra = Compra.realizar({
+        comprador: compradora,
+        evento,
+        tipoEntradaId: 1,
+        cantidad: 1,
+        ahora: antesDelEvento,
+        plazoParaPagarEnMinutos: 30,
+      });
+
+      expect(compra.venceElPago).toEqual(enHoras(0.5));
+    });
+
+    it("una compra pendiente fuera de plazo se vence: queda cancelada por el sistema y libera el cupo", () => {
+      const compra = comprar(2);
+
+      expect(compra.estaVencida(enHoras(23))).toBe(false);
+      compra.vencer(enHoras(25));
+
+      expect(compra.estado).toBe(EstadoCompra.CANCELADA);
+      expect(compra.historial.at(-1).quien).toBeNull();
+      expect(compra.historial.at(-1).toJSON().quien).toBeNull();
+      expect(evento.tiposEntrada[0].cupo).toBe(5);
+    });
+
+    it("no se puede pagar después del plazo, aunque todavía no se haya vencido", () => {
+      const compra = comprar();
+
+      expect(() => compra.pagar(compradora, enHoras(25))).toThrow("Venció el plazo para pagar esta compra");
+    });
+
+    it("una compra pagada no vence", () => {
+      const compra = comprar();
+      compra.pagar(compradora, antesDelEvento);
+
+      expect(compra.estaVencida(enHoras(48))).toBe(false);
+      expect(() => compra.vencer(enHoras(48))).toThrow("La compra no está vencida");
+    });
+  });
+
   describe("diasParaEvento", () => {
     it("cuenta los días de calendario que faltan si está confirmada", () => {
       const compra = comprar();

@@ -24,6 +24,16 @@ describe("Datos de prueba", () => {
     expect(compras.body.some((compra) => compra.puedeSerReseniada)).toBe(true);
   });
 
+  it("la compra pendiente de los datos de prueba no se vence durante la demo", async () => {
+    const enVeintitresHoras = Date.now() + 23 * 60 * 60 * 1000;
+    const auth = await login("comprador@aiticketit.com");
+
+    const compras = await request(app).get("/compras?estado=PENDIENTE").set("Authorization", auth);
+
+    expect(compras.body).toHaveLength(1);
+    expect(new Date(compras.body[0].venceElPago).getTime()).toBeGreaterThan(enVeintitresHoras);
+  });
+
   it("los organizadores tienen reputación por las reseñas de sus eventos pasados", async () => {
     const eventos = await request(app)
       .get("/eventos?orden=puntaje")

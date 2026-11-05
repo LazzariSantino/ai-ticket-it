@@ -52,7 +52,8 @@ export type EventoDetalle = Evento & {
   reseniasDelOrganizador: Resenia[];
 };
 
-export type CambioEstadoCompra = { estado: EstadoCompra; quien: UsuarioResumen; fechaHora: string };
+// quien = null cuando el cambio lo hizo el sistema (venció el plazo para pagar)
+export type CambioEstadoCompra = { estado: EstadoCompra; quien: UsuarioResumen | null; fechaHora: string };
 
 export type Compra = {
   id: number;
@@ -63,6 +64,7 @@ export type Compra = {
   total: number;
   fecha: string;
   estado: EstadoCompra;
+  venceElPago: string | null;
   diasParaEvento: number | null;
   puedeCancelarse: boolean;
   puedeSerReseniada: boolean;

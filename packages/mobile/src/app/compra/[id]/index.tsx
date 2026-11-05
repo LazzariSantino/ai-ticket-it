@@ -94,6 +94,13 @@ export default function CompraScreen() {
           <Fila etiqueta="Fecha de compra" valor={formatearFechaHora(compra.fecha)} />
         </Tarjeta>
 
+        {compra.venceElPago && (
+          <ThemedText type="small" themeColor="textSecondary" style={styles.aviso}>
+            {soyComprador ? "Pagala antes del" : "El comprador tiene tiempo de pagar hasta el"}{" "}
+            {formatearFechaHora(compra.venceElPago)}. Si no, se cancela sola y las entradas vuelven a estar a la venta.
+          </ThemedText>
+        )}
+
         {errorAccion && (
           <ThemedText type="small" themeColor="peligro">
             {errorAccion}
@@ -148,7 +155,10 @@ export default function CompraScreen() {
               <View style={styles.flex}>
                 <ThemedText type="smallBold">{textoEstado(cambio.estado)}</ThemedText>
                 <ThemedText type="small" themeColor="textSecondary">
-                  {formatearFechaHora(cambio.fechaHora)} · {cambio.quien.nombre} {cambio.quien.apellido}
+                  {formatearFechaHora(cambio.fechaHora)} ·{" "}
+                  {cambio.quien
+                    ? `${cambio.quien.nombre} ${cambio.quien.apellido}`
+                    : "Sistema (venció el plazo de pago)"}
                 </ThemedText>
               </View>
             </View>
@@ -184,6 +194,9 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     padding: Spacing.four,
     borderRadius: 18,
+  },
+  aviso: {
+    textAlign: "center",
   },
   fila: {
     flexDirection: "row",
