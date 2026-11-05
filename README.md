@@ -126,4 +126,4 @@ Cada cambio queda registrado como un `CambioEstadoCompra` (estado, quién y cuá
 
 ## 🤖 Uso de IA
 
-El proyecto se desarrolló con **Claude Code** como herramienta principal, partiendo del enunciado y del diagrama de clases, y siguiendo la arquitectura y convenciones vistas en la materia. Cada funcionalidad quedó en un commit separado para poder revisarla de a una.
+El proyecto se desarrolló con herramientas de inteligencia artificial como apoyo principal, partiendo del enunciado y del diagrama de clases, y siguiendo la arquitectura y convenciones vistas en la materia. Cada funcionalidad quedó en un commit separado para poder revisarla de a una.
