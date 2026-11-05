@@ -114,6 +114,19 @@ describe("API: /compras", () => {
     expect(otraVez.status).toBe(422);
   });
 
+  it("GET /compras/:id/mensajes?desde=N devuelve sólo los mensajes nuevos", async () => {
+    const { body: compra } = await comprar();
+    for (const mensaje of ["uno", "dos", "tres"]) {
+      await request(app).post(`/compras/${compra.id}/mensajes`).set("Authorization", compradora).send({ mensaje });
+    }
+
+    const nuevos = await request(app).get(`/compras/${compra.id}/mensajes?desde=2`).set("Authorization", compradora);
+    const invalido = await request(app).get(`/compras/${compra.id}/mensajes?desde=-1`).set("Authorization", compradora);
+
+    expect(nuevos.body.map((m) => m.mensaje)).toEqual(["tres"]);
+    expect(invalido.status).toBe(400);
+  });
+
   it("comprador y organizador chatean dentro de la compra, aun cancelada", async () => {
     const { body: compra } = await comprar();
     await request(app).post(`/compras/${compra.id}/cancelacion`).set("Authorization", compradora);

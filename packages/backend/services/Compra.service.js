@@ -89,9 +89,11 @@ export class CompraService {
     return await this._compraRepository.guardar(compra);
   }
 
-  async listarMensajes(usuario, compraId) {
+  // Los mensajes sólo se agregan al final, así que `desde` (la cantidad que la app ya tiene) alcanza
+  // para devolver únicamente los nuevos
+  async listarMensajes(usuario, compraId, { desde = 0 } = {}) {
     const compra = await this.obtenerCompra(usuario, compraId);
-    return compra.mensajes;
+    return compra.mensajes.slice(desde);
   }
 
   async enviarMensaje(usuario, compraId, texto) {

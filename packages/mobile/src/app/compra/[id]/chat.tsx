@@ -27,21 +27,37 @@ export default function ChatScreen() {
   const [enviando, setEnviando] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
   const lista = useRef<FlatList>(null);
+  const cantidadActual = useRef(0);
+  cantidadActual.current = mensajes?.length ?? 0;
+
+  // Pide sólo los mensajes que todavía no tiene. Los agrega a partir de la posición que pidió, así
+  // si dos pedidos se cruzan (el del intervalo y el de un envío) no queda ningún mensaje repetido.
+  const buscarNuevos = useCallback(async () => {
+    const desde = cantidadActual.current;
+    try {
+      const nuevos = await listarMensajes(id, desde);
+      if (nuevos.length > 0) {
+        setDatos((anteriores) => [...(anteriores ?? []).slice(0, desde), ...nuevos]);
+      }
+    } catch {
+      // Si falla (por ejemplo, sin conexión) se vuelve a intentar en el próximo intervalo
+    }
+  }, [id, setDatos]);
 
   useFocusEffect(
     useCallback(() => {
-      const intervalo = setInterval(recargar, INTERVALO_ACTUALIZACION_MS);
+      const intervalo = setInterval(buscarNuevos, INTERVALO_ACTUALIZACION_MS);
       return () => clearInterval(intervalo);
-    }, [recargar]),
+    }, [buscarNuevos]),
   );
 
   async function enviar() {
     setEnviando(true);
     setErrorEnvio(null);
     try {
-      const mensaje = await enviarMensaje(id, texto);
-      setDatos([...(mensajes ?? []), mensaje]);
+      await enviarMensaje(id, texto);
       setTexto("");
+      await buscarNuevos();
     } catch (e) {
       setErrorEnvio(e instanceof Error ? e.message : "No se pudo enviar el mensaje");
     } finally {

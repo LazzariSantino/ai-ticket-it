@@ -17,7 +17,9 @@ export const cancelar = (id: number) => pedir<Compra>(`/compras/${id}/cancelacio
 
 export const marcarUtilizada = (id: number) => pedir<Compra>(`/compras/${id}/uso`, { metodo: "POST" });
 
-export const listarMensajes = (id: number | string) => pedir<Mensaje[]>(`/compras/${id}/mensajes`);
+// Con `desde` (la cantidad de mensajes que ya se tienen) el backend devuelve sólo los nuevos
+export const listarMensajes = (id: number | string, desde = 0) =>
+  pedir<Mensaje[]>(`/compras/${id}/mensajes${desde > 0 ? `?desde=${desde}` : ""}`);
 
 export const enviarMensaje = (id: number | string, mensaje: string) =>
   pedir<Mensaje>(`/compras/${id}/mensajes`, { metodo: "POST", body: { mensaje } });

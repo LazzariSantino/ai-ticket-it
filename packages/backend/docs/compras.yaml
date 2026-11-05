@@ -186,9 +186,14 @@ paths:
     get:
       tags: [Compras]
       summary: Chat de la compra
+      description: Con `desde` devuelve sólo los mensajes a partir de esa posición, para pedir únicamente los nuevos.
       security: [{ bearerAuth: [] }]
       parameters:
         - { in: path, name: id, required: true, schema: { type: integer } }
+        - in: query
+          name: desde
+          description: Cantidad de mensajes que ya se tienen (se devuelven los siguientes).
+          schema: { type: integer, minimum: 0, default: 0 }
       responses:
         "200":
           description: Los mensajes, del más viejo al más nuevo.

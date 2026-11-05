@@ -1,4 +1,5 @@
-import { validarCamposRequeridos } from "./validaciones.js";
+import { ValidationError } from "../errors/ValidationError.js";
+import { numeroOpcional, validarCamposRequeridos } from "./validaciones.js";
 
 export class CompraController {
   constructor(compraService) {
@@ -54,8 +55,13 @@ export class CompraController {
     return res.status(200).json(await this.presentar(compra));
   }
 
+  // GET /compras/:id/mensajes?desde=N devuelve los mensajes a partir de la posición N (los nuevos)
   async listarMensajes(req, res) {
-    const mensajes = await this.compraService.listarMensajes(req.usuario, req.params.id);
+    const desde = numeroOpcional(req.query.desde, "desde") ?? 0;
+    if (!Number.isInteger(desde) || desde < 0) {
+      throw new ValidationError("El parámetro desde debe ser un número entero mayor o igual a 0");
+    }
+    const mensajes = await this.compraService.listarMensajes(req.usuario, req.params.id, { desde });
     return res.status(200).json(mensajes);
   }
 
