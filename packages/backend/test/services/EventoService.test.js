@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { EventoService } from "../../services/Evento.service.js";
 import { CategoriaService } from "../../services/Categoria.service.js";
 import { EventoRepository } from "../../repository/Evento.repository.js";
@@ -117,6 +118,23 @@ describe("EventoService", () => {
         "Noche de Jazz",
         "Hamlet",
       ]);
+    });
+
+    it("busca las reseñas una sola vez por organizador, no una vez por evento", async () => {
+      const buscarPorOrganizador = jest.spyOn(reseniaRepository, "buscarPorOrganizador");
+
+      await service.buscarEventos();
+
+      // 3 eventos de 2 organizadores
+      expect(buscarPorOrganizador).toHaveBeenCalledTimes(2);
+    });
+
+    it("el detalle de un evento busca las reseñas del organizador una sola vez", async () => {
+      const buscarPorOrganizador = jest.spyOn(reseniaRepository, "buscarPorOrganizador");
+
+      await service.obtenerEvento(obra.id, compradora);
+
+      expect(buscarPorOrganizador).toHaveBeenCalledTimes(1);
     });
 
     it("ordena por puntaje del organizador, dejando al final a los que no tienen reseñas", async () => {

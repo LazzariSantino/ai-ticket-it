@@ -30,7 +30,7 @@ export class EventoService {
     }
 
     await this._eventoRepository.guardar(evento);
-    return await this._conReputacion(evento);
+    return this._conReputacion(evento, await this.reputacionDe(organizador.id));
   }
 
   // Sólo muestra eventos que todavía no se realizaron
@@ -52,7 +52,7 @@ export class EventoService {
         evento.tuPrecioEstaEntre(precioMinimo ?? 0, precioMaximo ?? Infinity),
     );
 
-    const conReputacion = await Promise.all(eventos.map((evento) => this._conReputacion(evento)));
+    const conReputacion = await this._conReputaciones(eventos);
     return this._ordenar(conReputacion, criterio, direccion ?? criterio.direccion);
   }
 
@@ -70,9 +70,10 @@ export class EventoService {
 
   async obtenerEvento(eventoId, usuario) {
     const evento = await this.buscarEventoExistente(eventoId);
+    // Las reseñas se buscan una sola vez: sirven para mostrarlas y para calcular el puntaje
     const resenias = await this._reseniaRepository.buscarPorOrganizador(evento.organizador.id);
     return {
-      ...(await this._conReputacion(evento)),
+      ...this._conReputacion(evento, this._calcularReputacion(resenias)),
       esFavorito: usuario.esFavorito(evento),
       esOrganizador: evento.esOrganizadoPor(usuario),
       reseniasDelOrganizador: resenias,
@@ -82,7 +83,7 @@ export class EventoService {
   async listarEventosDelOrganizador(organizador) {
     const eventos = await this._eventoRepository.buscarPorOrganizador(organizador.id);
     eventos.sort((a, b) => a.fecha - b.fecha);
-    return await Promise.all(eventos.map((evento) => this._conReputacion(evento)));
+    return await this._conReputaciones(eventos);
   }
 
   async agregarFavorito(usuario, eventoId) {
@@ -96,7 +97,7 @@ export class EventoService {
   }
 
   async listarFavoritos(usuario) {
-    return await Promise.all(usuario.favoritos.map((evento) => this._conReputacion(evento)));
+    return await this._conReputaciones(usuario.favoritos);
   }
 
   async buscarEventoExistente(eventoId) {
@@ -109,7 +110,10 @@ export class EventoService {
 
   // Puntaje promedio de las reseñas de todos los eventos del organizador, con un decimal
   async reputacionDe(organizadorId) {
-    const resenias = await this._reseniaRepository.buscarPorOrganizador(organizadorId);
+    return this._calcularReputacion(await this._reseniaRepository.buscarPorOrganizador(organizadorId));
+  }
+
+  _calcularReputacion(resenias) {
     if (resenias.length === 0) {
       return { puntaje: null, cantidadResenias: 0 };
     }
@@ -117,8 +121,17 @@ export class EventoService {
     return { puntaje: Math.round(promedio * 10) / 10, cantidadResenias: resenias.length };
   }
 
-  async _conReputacion(evento) {
+  _conReputacion(evento, reputacion) {
     const json = evento.toJSON();
-    return { ...json, organizador: { ...json.organizador, ...(await this.reputacionDe(evento.organizador.id)) } };
+    return { ...json, organizador: { ...json.organizador, ...reputacion } };
+  }
+
+  // Calcula la reputación una sola vez por organizador, aunque tenga muchos eventos en la lista
+  async _conReputaciones(eventos) {
+    const reputaciones = new Map();
+    for (const organizadorId of new Set(eventos.map((evento) => evento.organizador.id))) {
+      reputaciones.set(organizadorId, await this.reputacionDe(organizadorId));
+    }
+    return eventos.map((evento) => this._conReputacion(evento, reputaciones.get(evento.organizador.id)));
   }
 }
