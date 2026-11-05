@@ -3,10 +3,14 @@ import { Usuario } from "../domain/Usuario.js";
 import { ConflictError } from "../errors/ConflictError.js";
 import { UnauthorizedError } from "../errors/UnauthorizedError.js";
 
+// Cuánto dura una sesión desde el login. Después hay que volver a iniciar sesión.
+export const DURACION_SESION_HORAS = 12;
+
 export class AuthService {
-  constructor(usuarioRepository, sesionRepository) {
+  constructor(usuarioRepository, sesionRepository, reloj = () => new Date()) {
     this._usuarioRepository = usuarioRepository;
     this._sesionRepository = sesionRepository;
+    this._reloj = reloj;
   }
 
   async registrar({ nombre, apellido, email, contrasenia }) {
@@ -34,16 +38,23 @@ export class AuthService {
   }
 
   async usuarioDeToken(token) {
-    const usuario = token ? await this._sesionRepository.buscarUsuario(token) : null;
-    if (!usuario) {
-      throw new UnauthorizedError("La sesión no es válida o expiró, volvé a iniciar sesión");
+    const sesion = token ? await this._sesionRepository.buscar(token) : null;
+    if (!sesion) {
+      throw new UnauthorizedError("La sesión no es válida, volvé a iniciar sesión");
     }
-    return usuario;
+    if (sesion.venceEl <= this._reloj()) {
+      await this._sesionRepository.eliminar(token);
+      throw new UnauthorizedError("La sesión expiró, volvé a iniciar sesión");
+    }
+    return sesion.usuario;
   }
 
   async _iniciarSesion(usuario) {
+    const ahora = this._reloj();
+    await this._sesionRepository.eliminarVencidas(ahora);
     const token = randomUUID();
-    await this._sesionRepository.guardar(token, usuario);
+    const venceEl = new Date(ahora.getTime() + DURACION_SESION_HORAS * 60 * 60 * 1000);
+    await this._sesionRepository.guardar(token, usuario, venceEl);
     return { token, usuario };
   }
 }

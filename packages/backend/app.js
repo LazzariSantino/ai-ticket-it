@@ -60,6 +60,7 @@ export async function crearApp({
   const compraRepository = new CompraRepository();
 
   // Services
+  // Las sesiones vencen con la hora real, no con el reloj de la aplicación que los tests mueven para simular fechas
   const authService = new AuthService(usuarioRepository, sesionRepository);
   const categoriaService = new CategoriaService(categoriaRepository);
   await categoriaService.cargarCategoriasIniciales();
