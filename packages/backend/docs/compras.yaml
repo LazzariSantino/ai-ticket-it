@@ -124,7 +124,7 @@ paths:
     post:
       tags: [Compras]
       summary: Pagar una compra (simulado)
-      description: "El comprador confirma el pago: `PENDIENTE` → `CONFIRMADA`."
+      description: "El comprador confirma el pago: `PENDIENTE` → `CONFIRMADA`. No se puede pagar si el evento ya se realizó."
       security: [{ bearerAuth: [] }]
       parameters:
         - { in: path, name: id, required: true, schema: { type: integer } }
@@ -308,7 +308,7 @@ components:
         diasParaEvento:
           type: integer
           nullable: true
-          description: Días de calendario que faltan para el evento. Sólo para compras confirmadas.
+          description: Días de calendario que faltan para el evento (0 = es hoy). Sólo para compras confirmadas de eventos que todavía no se realizaron.
         puedeCancelarse: { type: boolean }
         puedeSerReseniada: { type: boolean }
         cantidadMensajes: { type: integer }

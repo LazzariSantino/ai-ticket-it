@@ -111,7 +111,16 @@ describe("Dominio: Compra", () => {
     });
 
     it("sólo la puede pagar quien compró", () => {
-      expect(() => comprar().pagar(otro)).toThrow(ForbiddenError);
+      expect(() => comprar().pagar(otro, antesDelEvento)).toThrow(ForbiddenError);
+    });
+
+    it("no se puede pagar si el evento ya se realizó", () => {
+      const compra = comprar();
+
+      expect(() => compra.pagar(compradora, despuesDelEvento)).toThrow(
+        "No se puede pagar una compra de un evento que ya se realizó",
+      );
+      expect(compra.estado).toBe(EstadoCompra.PENDIENTE);
     });
   });
 
@@ -216,6 +225,14 @@ describe("Dominio: Compra", () => {
 
     it("es null si la compra no está confirmada", () => {
       expect(comprar().diasParaEvento(antesDelEvento)).toBeNull();
+    });
+
+    it("es null si el evento ya se realizó, en vez de quedar en 0 para siempre", () => {
+      const compra = comprar();
+      compra.pagar(compradora, antesDelEvento);
+
+      expect(compra.diasParaEvento(despuesDelEvento)).toBeNull();
+      expect(compra.diasParaEvento(new Date(2027, 0, 10))).toBeNull();
     });
   });
 

@@ -70,6 +70,9 @@ export class Compra {
     if (!this.esComprador(quien)) {
       throw new ForbiddenError("Sólo quien hizo la compra puede pagarla");
     }
+    if (this.evento.yaSeRealizo(ahora)) {
+      throw new UnprocessableEntityError("No se puede pagar una compra de un evento que ya se realizó");
+    }
     this.actualizarEstado(EstadoCompra.CONFIRMADA, quien, ahora);
   }
 
@@ -109,13 +112,13 @@ export class Compra {
     this.actualizarEstado(EstadoCompra.UTILIZADA, quien, ahora);
   }
 
-  // Días de calendario que faltan para el evento. Sólo tiene sentido para compras confirmadas.
+  // Días de calendario que faltan para el evento. Sólo tiene sentido para compras confirmadas
+  // de eventos que todavía no se realizaron (0 = es hoy, más tarde).
   diasParaEvento(ahora = new Date()) {
-    if (this.estado !== EstadoCompra.CONFIRMADA) {
+    if (this.estado !== EstadoCompra.CONFIRMADA || this.evento.yaSeRealizo(ahora)) {
       return null;
     }
-    const dias = Math.round((inicioDelDia(this.evento.fecha) - inicioDelDia(ahora)) / MILISEGUNDOS_POR_DIA);
-    return Math.max(dias, 0);
+    return Math.round((inicioDelDia(this.evento.fecha) - inicioDelDia(ahora)) / MILISEGUNDOS_POR_DIA);
   }
 
   enviarMensaje(usuario, texto, ahora = new Date()) {
