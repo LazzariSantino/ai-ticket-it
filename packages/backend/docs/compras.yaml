@@ -59,6 +59,24 @@ paths:
               schema: { $ref: "#/components/schemas/Error" }
         "401":
           $ref: "#/components/responses/NoAutenticado"
+  /compras/chats:
+    get:
+      tags: [Compras]
+      summary: Mis chats
+      description: >-
+        Las compras con mensajes en las que participa el usuario, como comprador o como organizador del evento.
+        Vienen ordenadas por el último mensaje, el más reciente primero.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Las compras con chat, cada una con su `ultimoMensaje`.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Compra" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
   /eventos/{eventoId}/compras:
     get:
       tags: [Compras]
@@ -328,6 +346,10 @@ components:
         puedeCancelarse: { type: boolean }
         puedeSerReseniada: { type: boolean }
         cantidadMensajes: { type: integer }
+        ultimoMensaje:
+          allOf:
+            - $ref: "#/components/schemas/Mensaje"
+          nullable: true
         resenia:
           allOf:
             - $ref: "#/components/schemas/Resenia"

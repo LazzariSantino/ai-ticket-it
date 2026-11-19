@@ -127,6 +127,32 @@ describe("API: /compras", () => {
     expect(invalido.status).toBe(400);
   });
 
+  it("GET /compras/chats lista los chats del usuario, con el último mensaje y el más reciente primero", async () => {
+    const { body: sinMensajes } = await comprar(1);
+    const { body: primera } = await comprar(1);
+    const { body: segunda } = await comprar(1);
+    const escribir = (compra, auth, mensaje) =>
+      request(app).post(`/compras/${compra.id}/mensajes`).set("Authorization", auth).send({ mensaje });
+    await escribir(primera, compradora, "¿Hay guardarropa?");
+    ahora = new Date("2026-11-01T13:00:00.000Z");
+    await escribir(segunda, compradora, "¿Se puede entrar con cámara?");
+    ahora = new Date("2026-11-01T14:00:00.000Z");
+    await escribir(primera, organizadora, "Sí, en la entrada");
+
+    const deLaCompradora = await request(app).get("/compras/chats").set("Authorization", compradora);
+    const deLaOrganizadora = await request(app).get("/compras/chats").set("Authorization", organizadora);
+    const deOtro = await request(app)
+      .get("/compras/chats")
+      .set("Authorization", await registrar("otro"));
+
+    expect(deLaCompradora.status).toBe(200);
+    expect(deLaCompradora.body.map((compra) => compra.id)).toEqual([primera.id, segunda.id]);
+    expect(deLaCompradora.body[0].ultimoMensaje).toMatchObject({ mensaje: "Sí, en la entrada" });
+    expect(deLaOrganizadora.body.map((compra) => compra.id)).toEqual([primera.id, segunda.id]);
+    expect(deLaCompradora.body.map((compra) => compra.id)).not.toContain(sinMensajes.id);
+    expect(deOtro.body).toEqual([]);
+  });
+
   it("comprador y organizador chatean dentro de la compra, aun cancelada", async () => {
     const { body: compra } = await comprar();
     await request(app).post(`/compras/${compra.id}/cancelacion`).set("Authorization", compradora);

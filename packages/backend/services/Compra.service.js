@@ -40,6 +40,12 @@ export class CompraService {
     return compras.filter((compra) => !estado || compra.estado === estado).sort((a, b) => b.fecha - a.fecha);
   }
 
+  // Los chats en los que participa el usuario (como comprador o como organizador), el de actividad más reciente primero
+  async listarChats(usuario) {
+    const compras = await this._compraRepository.buscarConMensajesDe(usuario);
+    return compras.sort((a, b) => b.mensajes.at(-1).enviado - a.mensajes.at(-1).enviado);
+  }
+
   // Para el organizador: las compras del evento, cuántas hay en cada estado y el cupo que queda de cada tipo
   async listarComprasDeEvento(organizador, eventoId, { estado } = {}) {
     this._validarEstado(estado);

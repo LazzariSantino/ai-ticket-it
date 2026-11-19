@@ -9,6 +9,10 @@ export class CompraRepository extends RepositorioEnMemoria {
     return this.buscarDonde((compra) => compra.estaVencida(ahora));
   }
 
+  async buscarConMensajesDe(usuario) {
+    return this.buscarDonde((compra) => compra.mensajes.length > 0 && compra.participa(usuario));
+  }
+
   async buscarPorEvento(eventoId) {
     return this.buscarDonde((compra) => compra.evento.id === eventoId);
   }

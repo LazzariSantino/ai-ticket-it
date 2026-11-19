@@ -206,6 +206,7 @@ export class Compra {
       diasParaEvento: this.diasParaEvento(ahora),
       puedeCancelarse: this.puedeCancelarse(ahora),
       cantidadMensajes: this.mensajes.length,
+      ultimoMensaje: this.mensajes.at(-1) ?? null,
       puedeSerReseniada: this.puedeSerReseniada(),
       resenia: this.resenia,
       historial: this.historial,

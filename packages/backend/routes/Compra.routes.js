@@ -6,6 +6,8 @@ export function crearCompraRouter(compraController, autenticar) {
 
   router.post("/", (req, res) => compraController.comprar(req, res));
   router.get("/", (req, res) => compraController.listarMisCompras(req, res));
+  // Va antes de /:id para que "chats" no se tome como el id de una compra
+  router.get("/chats", (req, res) => compraController.listarChats(req, res));
   router.get("/:id", (req, res) => compraController.obtenerCompra(req, res));
   // Cada acción que cambia el estado de la compra es un recurso propio, así queda claro qué regla se aplica
   router.post("/:id/pago", (req, res) => compraController.pagar(req, res));

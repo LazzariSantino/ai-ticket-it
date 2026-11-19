@@ -28,6 +28,11 @@ export class CompraController {
     return res.status(200).json(await this.presentarTodas(compras));
   }
 
+  async listarChats(req, res) {
+    const compras = await this.compraService.listarChats(req.usuario);
+    return res.status(200).json(await this.presentarTodas(compras));
+  }
+
   async listarComprasDeEvento(req, res) {
     const resultado = await this.compraService.listarComprasDeEvento(req.usuario, req.params.eventoId, {
       estado: req.query.estado,
