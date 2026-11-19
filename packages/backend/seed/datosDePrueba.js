@@ -17,7 +17,8 @@ export async function cargarDatosDePrueba(
     return fecha;
   };
   const categoria = async (nombre) => (await categoriaRepository.buscarTodos()).find((c) => c.nombre === nombre);
-  const imagen = (semilla) => `https://picsum.photos/seed/${semilla}/800/450`;
+  // Fotos reales de Wikimedia Commons, todas con licencia libre (CC o dominio público)
+  const foto = (ruta) => `https://thumb.wikimedia.org/wikipedia/commons/thumb/${ruta}`;
 
   // --- Usuarios (todos con la misma contraseña) ---
   const usuario = async (nombre, apellido, email) =>
@@ -38,7 +39,10 @@ export async function cargarDatosDePrueba(
     descripcion: "La banda de Chano y Bambi repasa sus himnos de siempre y las canciones nuevas. Puertas 19:30.",
     categoria: await categoria("Recitales"),
     fecha: enDias(12),
-    multimedia: [imagen("tan-bionica-arena"), imagen("tan-bionica-luces")],
+    multimedia: [
+      foto("3/3f/Tan_Bi%C3%B3nica.JPG/960px-Tan_Bi%C3%B3nica.JPG"),
+      foto("f/fa/Movistar_Arena_junio_de_2025_-_BugWarp_02.jpg/960px-Movistar_Arena_junio_de_2025_-_BugWarp_02.jpg"),
+    ],
     organizador: martin,
     tiposEntrada: [
       { nombre: "Campo", descripcion: "De pie", precio: 65000, cupo: 120 },
@@ -50,7 +54,12 @@ export async function cargarDatosDePrueba(
     descripcion: 'Los creadores de "Smoke on the Water" vuelven a Buenos Aires con un show de clásicos del hard rock.',
     categoria: await categoria("Recitales"),
     fecha: enDias(21, 21),
-    multimedia: [imagen("deep-purple-arena")],
+    multimedia: [
+      foto(
+        "0/05/Deep_Purple_live_at_BTarena_in_Cluj-Napoca%2C_Transylvania%2C_Romania_%281_October%2C_2026%29.jpg/960px-Deep_Purple_live_at_BTarena_in_Cluj-Napoca%2C_Transylvania%2C_Romania_%281_October%2C_2026%29.jpg",
+      ),
+      foto("e/e3/Deep_Purple_-_MN_Gredos_-_03.jpg/960px-Deep_Purple_-_MN_Gredos_-_03.jpg"),
+    ],
     organizador: martin,
     tiposEntrada: [
       { nombre: "Campo", descripcion: "Frente al escenario", precio: 85000, cupo: 500 },
@@ -65,7 +74,7 @@ export async function cargarDatosDePrueba(
       "El comediante presenta su unipersonal en la Terraza Teatro Bar de Paseo La Plaza (Av. Corrientes 1660).",
     categoria: await categoria("Stand up"),
     fecha: new Date(Math.min(ahora.getTime() + 2 * 60 * 60 * 1000, enDias(0, 23, 59).getTime())),
-    multimedia: [imagen("fede-simonetti-standup")],
+    multimedia: [foto("e/ee/Standup_Shot_Template.jpg/960px-Standup_Shot_Template.jpg")],
     organizador: martin,
     tiposEntrada: [{ nombre: "General", precio: 25000, cupo: 80 }],
   });
@@ -75,7 +84,7 @@ export async function cargarDatosDePrueba(
       "La conferencia de seguridad informática más antigua de Latinoamérica: charlas de hacking, CTF y talleres.",
     categoria: await categoria("Conferencias"),
     fecha: enDias(-20, 10),
-    multimedia: [imagen("ekoparty-hacking")],
+    multimedia: [foto("e/e2/Danilo_Erazo_at_Ekoparty.jpg/960px-Danilo_Erazo_at_Ekoparty.jpg")],
     organizador: martin,
     tiposEntrada: [{ nombre: "General", descripcion: "Acceso a charlas y CTF", precio: 40000, cupo: 200 }],
   });
@@ -84,7 +93,11 @@ export async function cargarDatosDePrueba(
     descripcion: "Teatro físico, danza y humor sin palabras en el Teatro Metropolitan, sobre la calle Corrientes.",
     categoria: await categoria("Teatro"),
     fecha: enDias(20, 20, 30),
-    multimedia: [imagen("un-poyo-rojo-teatro")],
+    multimedia: [
+      foto(
+        "1/1e/Teatro_Metropolitan_en_Avenida_Corrientes%2C_Buenos_Aires.jpg/960px-Teatro_Metropolitan_en_Avenida_Corrientes%2C_Buenos_Aires.jpg",
+      ),
+    ],
     organizador: carla,
     tiposEntrada: [
       { nombre: "Platea", precio: 38000, cupo: 200 },
@@ -97,7 +110,10 @@ export async function cargarDatosDePrueba(
       "Jornada de FUNDETEC sobre redes, conectividad, ciberseguridad e inteligencia artificial, presencial y con transmisión en línea.",
     categoria: await categoria("Conferencias"),
     fecha: enDias(14, 9),
-    multimedia: [imagen("encuentro-telecom-redes")],
+    multimedia: [
+      foto("5/5d/BalticServers_data_center.jpg/960px-BalticServers_data_center.jpg"),
+      foto("8/83/Fujikura_optic_fiber_at_Science_Museum.jpg/960px-Fujikura_optic_fiber_at_Science_Museum.jpg"),
+    ],
     organizador: carla,
     tiposEntrada: [
       { nombre: "General", descripcion: "Acceso a las charlas", precio: 0, cupo: 300 },
@@ -115,7 +131,12 @@ export async function cargarDatosDePrueba(
       "Tres días en el Hipódromo de San Isidro con Travis Scott, Charli xcx, The Killers, TINI, David Guetta y más de 70 artistas.",
     categoria: await categoria("Festivales"),
     fecha: enDias(113, 12),
-    multimedia: [imagen("lollapalooza-hipodromo"), imagen("lollapalooza-escenario")],
+    multimedia: [
+      foto(
+        "7/7e/Lollapalooza_Argentina%21_%2833655638331%29.jpg/960px-Lollapalooza_Argentina%21_%2833655638331%29.jpg",
+      ),
+      foto("7/73/Lollapalooza_Argentina_%2813913278803%29.jpg/960px-Lollapalooza_Argentina_%2813913278803%29.jpg"),
+    ],
     organizador: carla,
     tiposEntrada: [
       { nombre: "Abono 3 días", precio: 420000, cupo: 1000 },
@@ -127,7 +148,12 @@ export async function cargarDatosDePrueba(
     descripcion: "La final del fútbol argentino en el Estadio Único Diego Armando Maradona de La Plata.",
     categoria: await categoria("Deportes"),
     fecha: enDias(23, 19),
-    multimedia: [imagen("final-clausura-estadio")],
+    multimedia: [
+      foto(
+        "a/a0/Estadio_%C3%9Anico_de_La_Plata%2C_Buenos_Aires%2C_Argentina%2C_Noche%2C_mar-2011_-_panoramio.jpg/960px-Estadio_%C3%9Anico_de_La_Plata%2C_Buenos_Aires%2C_Argentina%2C_Noche%2C_mar-2011_-_panoramio.jpg",
+      ),
+      foto("9/9f/Estadio_%C3%9Anico_de_La_Plata.jpg/960px-Estadio_%C3%9Anico_de_La_Plata.jpg"),
+    ],
     organizador: carla,
     tiposEntrada: [
       { nombre: "Popular", precio: 45000, cupo: 2000 },
@@ -140,7 +166,10 @@ export async function cargarDatosDePrueba(
       "El evento de tecnología gratuito más grande de habla hispana, organizado por Sysarmy en Ciudad Cultural Konex: IA, open source y ciencia.",
     categoria: await categoria("Conferencias"),
     fecha: enDias(-40, 10),
-    multimedia: [imagen("nerdearla-konex")],
+    multimedia: [
+      foto("1/1c/Nerdearla_-_2017_-_20.jpg/960px-Nerdearla_-_2017_-_20.jpg"),
+      foto("1/12/Ciudad_Cultural_Konex.jpg/960px-Ciudad_Cultural_Konex.jpg"),
+    ],
     organizador: carla,
     tiposEntrada: [{ nombre: "General", descripcion: "Entrada gratuita con inscripción", precio: 0, cupo: 60 }],
   });
