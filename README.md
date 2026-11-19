@@ -80,7 +80,7 @@ En el navegador las pestañas aparecen arriba en vez de abajo, y si recargás la
 
 ## 5. Usuarios de prueba
 
-Todos con la contraseña **`123456`**. En la pantalla de login, tocando el email de un usuario se completan los datos solos.
+Todos con la contraseña **`123456`**. La app no los muestra en el login: hay que escribir el email y la contraseña.
 
 | Email                        | Quién es         | Qué tiene cargado                                                                                                         |
 | ---------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -107,7 +107,7 @@ Cualquier usuario puede comprar y también publicar eventos.
 
 **Como compradora** (`comprador@aiticketit.com`):
 
-- [ ] **Buscar y explorar**: en **Explorar**, buscá "biónica" o "conferencia", filtrá por una categoría y ordená por Fecha, Precio y Puntaje (con la flecha cambiás el sentido).
+- [ ] **Buscar y explorar**: en **Explorar**, buscá "bionica" (sin tilde) o "conferencia", filtrá por una categoría y ordená por Fecha, Precio y Puntaje (con la flecha cambiás el sentido).
 - [ ] **Reseñas del organizador**: entrá a un evento de Martín y bajá hasta sus reseñas.
 - [ ] **Comprar sin superar el cupo**: en **Deep Purple en el Movistar Arena** elegí **VIP**. Quedan 2, así que el botón `+` no deja pasar de 2. En otros tipos el tope es 10 por compra.
 - [ ] **Favoritos**: tocá el ♡ arriba a la derecha de un evento y fijate que aparezca en **Perfil**.
