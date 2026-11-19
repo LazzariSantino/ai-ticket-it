@@ -126,7 +126,7 @@ Cualquier usuario puede comprar y también publicar eventos.
 - [ ] **Compras de un evento**: en **Mis eventos** tocá **Stand up: Fede Simonetti**. Vas a ver las compras por estado y cuántas entradas quedan de cada tipo.
 - [ ] **Validar una entrada**: abrí la compra de Lucía del Stand up y tocá **Validar entrada**. Queda Utilizada.
 - [ ] **Responder el chat**: en **Mis eventos → Tan Biónica en el Movistar Arena**, abrí la compra de Lucía, entrá al chat y respondé.
-- [ ] **Crear un evento**: en **Mis eventos** tocá **+ Crear**. Completá nombre y descripción, elegí la categoría en el desplegable, el día en el calendario (los días pasados no se pueden elegir), la hora en el desplegable y cargá al menos dos tipos de entrada con precio y cupo. Después buscalo en **Explorar**.
+- [ ] **Crear un evento**: en **Mis eventos** tocá **+ Crear**. Completá nombre y descripción, elegí la categoría en el desplegable, el día en el calendario (los días pasados no se pueden elegir), la hora en el desplegable, elegí una o más fotos de la galería (la primera es la portada) y cargá al menos dos tipos de entrada con precio y cupo. Después buscalo en **Explorar**.
 - [ ] **No podés comprar tu propio evento**: en el detalle de un evento tuyo no aparece la compra, sino "Ver compras del evento".
 
 Con dos celulares (o celular y navegador), uno con cada usuario, se ve el chat en vivo: los mensajes nuevos llegan solos cada 5 segundos.
