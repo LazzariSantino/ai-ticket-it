@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from "react-native";
 
 import { listarChats } from "@/api/compras";
@@ -13,10 +14,20 @@ import { useTheme } from "@/hooks/use-theme";
 import { useUsuario } from "@/sesion/sesion-context";
 import { formatearFechaHora } from "@/utils/formato";
 
+const INTERVALO_ACTUALIZACION_MS = 5000;
+
 // Todos los chats en un solo lugar: los de mis compras y los de las compras de mis eventos
 export default function MensajesScreen() {
   const theme = useTheme();
-  const { datos, error, cargando, recargando, recargar } = useConsulta(listarChats);
+  const { datos, error, cargando, recargando, recargar, actualizar } = useConsulta(listarChats);
+
+  // Mientras la pestaña está abierta, los chats nuevos y los no leídos aparecen solos
+  useFocusEffect(
+    useCallback(() => {
+      const intervalo = setInterval(actualizar, INTERVALO_ACTUALIZACION_MS);
+      return () => clearInterval(intervalo);
+    }, [actualizar]),
+  );
 
   return (
     <PantallaTab titulo="Mensajes">
@@ -51,11 +62,14 @@ function Conversacion({ compra }: { compra: Compra }) {
   const otro = soyComprador ? compra.evento.organizador : compra.comprador;
   const ultimo = compra.ultimoMensaje;
   const autor = ultimo?.usuario.id === usuario.id ? "Vos" : ultimo?.usuario.nombre;
+  const sinLeer = compra.mensajesSinLeer ?? 0;
 
   return (
     <Link href={`/compra/${compra.id}/chat`} asChild>
       <Pressable
-        accessibilityLabel={`Chat con ${otro.nombre} ${otro.apellido} sobre ${compra.evento.nombre}`}
+        accessibilityLabel={`Chat con ${otro.nombre} ${otro.apellido} sobre ${compra.evento.nombre}${
+          sinLeer > 0 ? `, ${sinLeer} sin leer` : ""
+        }`}
         style={({ pressed }) => [
           styles.fila,
           { backgroundColor: theme.backgroundElement, borderColor: theme.borde, opacity: pressed ? 0.85 : 1 },
@@ -81,11 +95,18 @@ function Conversacion({ compra }: { compra: Compra }) {
             {soyComprador ? "Organizador" : "Comprador"} · {compra.evento.nombre}
           </ThemedText>
           {ultimo && (
-            <ThemedText type="small" numberOfLines={2}>
+            <ThemedText type={sinLeer > 0 ? "smallBold" : "small"} numberOfLines={2}>
               {autor}: {ultimo.mensaje}
             </ThemedText>
           )}
         </View>
+        {sinLeer > 0 && (
+          <View style={[styles.sinLeer, { backgroundColor: theme.peligro }]}>
+            <ThemedText type="smallBold" style={styles.sinLeerTexto}>
+              {sinLeer}
+            </ThemedText>
+          </View>
+        )}
       </Pressable>
     </Link>
   );
@@ -121,5 +142,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.two,
+  },
+  sinLeer: {
+    alignSelf: "center",
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    paddingHorizontal: 6,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sinLeerTexto: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    lineHeight: 16,
   },
 });

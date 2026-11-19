@@ -114,7 +114,7 @@ Cualquier usuario puede comprar y también publicar eventos.
 - [ ] **Mis compras**: revisá los colores de cada estado, filtrá por estado y fijate en "Faltan N días" de las confirmadas.
 - [ ] **Pagar**: abrí la compra pendiente de Deep Purple, fijate hasta cuándo se puede pagar y tocá **Pagar**. Pasa a Confirmada y aparece "Faltan N días".
 - [ ] **Chat**: en la compra de Tan Biónica, tocá **Chatear con el organizador** y mandá un mensaje.
-- [ ] **Mensajes**: en la pestaña **Mensajes** están todos tus chats, el más reciente primero, con el último mensaje. Tocá uno para abrirlo.
+- [ ] **Mensajes**: en la pestaña **Mensajes** están todos tus chats, el más reciente primero, con el último mensaje. Lucía arranca con un **1** rojo en la pestaña: Martín le respondió en el chat de Tan Biónica. Al abrir ese chat el número desaparece.
 - [ ] **Cancelar con reembolso**: en la compra de Tan Biónica, tocá **Cancelar y pedir reembolso**. Queda Reembolsada y en el historial aparecen los dos pasos.
 - [ ] **Reseñar**: en **Nerdearla Argentina 2026** elegí las estrellas, escribí un comentario y publicá.
 - [ ] **No se puede cancelar una utilizada**: en Ekoparty o Nerdearla no aparece el botón de cancelar.

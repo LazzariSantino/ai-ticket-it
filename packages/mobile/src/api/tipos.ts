@@ -70,6 +70,8 @@ export type Compra = {
   puedeSerReseniada: boolean;
   cantidadMensajes: number;
   ultimoMensaje: Mensaje | null;
+  // Sólo viene en la lista de chats: mensajes de la otra persona que todavía no se vieron
+  mensajesSinLeer?: number;
   resenia: Resenia | null;
   historial: CambioEstadoCompra[];
 };

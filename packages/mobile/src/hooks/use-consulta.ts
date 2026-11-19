@@ -45,6 +45,8 @@ export function useConsulta<T>(consultar: () => Promise<T>, dependencias: unknow
   );
 
   const recargar = useCallback(() => ejecutar(true), [ejecutar]);
+  // Como recargar, pero sin mostrar el indicador de carga (para actualizaciones automáticas)
+  const actualizar = useCallback(() => ejecutar(false), [ejecutar]);
 
-  return { datos, setDatos, error, cargando, recargando, recargar };
+  return { datos, setDatos, error, cargando, recargando, recargar, actualizar };
 }
