@@ -18,6 +18,12 @@ function calcularUrlBase() {
 
 export const URL_API = calcularUrlBase();
 
+// Las fotos subidas desde la app se guardan con una ruta relativa ("/imagenes/3"); acá se le agrega el servidor,
+// así se ven aunque cambie la IP de la red. Las de internet ("https://...") quedan como están.
+export function urlImagen(ruta: string | undefined) {
+  return ruta?.startsWith("/") ? `${URL_API}${ruta}` : ruta;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,

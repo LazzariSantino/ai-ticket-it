@@ -3,6 +3,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from "react-native";
 
+import { urlImagen } from "@/api/cliente";
 import { listarChats } from "@/api/compras";
 import type { Compra } from "@/api/tipos";
 import { Cargando, ErrorPantalla, Vacio } from "@/components/estado-pantalla";
@@ -77,7 +78,7 @@ function Conversacion({ compra }: { compra: Compra }) {
       ]}
     >
       <Image
-        source={compra.evento.multimedia[0]}
+        source={urlImagen(compra.evento.multimedia[0])}
         style={[styles.imagen, { backgroundColor: theme.primarioSuave }]}
         contentFit="cover"
       />

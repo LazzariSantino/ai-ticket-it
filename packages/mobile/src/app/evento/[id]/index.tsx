@@ -3,6 +3,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
+import { urlImagen } from "@/api/cliente";
 import { comprar } from "@/api/compras";
 import { agregarFavorito, obtenerEvento, quitarFavorito } from "@/api/eventos";
 import type { TipoEntrada } from "@/api/tipos";
@@ -119,7 +120,7 @@ export default function EventoScreen() {
             {evento.multimedia.map((url) => (
               <Image
                 key={url}
-                source={url}
+                source={urlImagen(url)}
                 style={[styles.imagen, { width: anchoFoto, backgroundColor: theme.primarioSuave }]}
                 contentFit="cover"
                 transition={250}

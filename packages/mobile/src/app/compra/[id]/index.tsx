@@ -3,6 +3,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { urlImagen } from "@/api/cliente";
 import { cancelar, marcarUtilizada, obtenerCompra, pagar } from "@/api/compras";
 import type { Compra } from "@/api/tipos";
 import { Boton } from "@/components/boton";
@@ -90,7 +91,7 @@ export default function CompraScreen() {
           ]}
         >
           <Image
-            source={compra.evento.multimedia[0]}
+            source={urlImagen(compra.evento.multimedia[0])}
             style={[styles.foto, { backgroundColor: theme.primarioSuave }]}
             contentFit="cover"
             transition={200}

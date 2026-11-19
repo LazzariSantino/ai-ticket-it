@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { urlImagen } from "@/api/cliente";
 import type { Compra } from "@/api/tipos";
 import { EstadoBadge } from "@/components/estado-badge";
 import { ThemedText } from "@/components/themed-text";
@@ -26,7 +27,7 @@ export function CompraCard({ compra, vista = "comprador" }: { compra: Compra; vi
     >
       {comprador && (
         <Image
-          source={compra.evento.multimedia[0]}
+          source={urlImagen(compra.evento.multimedia[0])}
           style={[styles.imagen, { backgroundColor: theme.primarioSuave }]}
           contentFit="cover"
           transition={200}
