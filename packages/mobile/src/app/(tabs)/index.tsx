@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { FlatList, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, StyleSheet, View } from "react-native";
 
 import { buscarEventos, listarCategorias } from "@/api/eventos";
 import type { OrdenEventos } from "@/api/tipos";
 import { CampoTexto } from "@/components/campo-texto";
-import { Chip } from "@/components/chip";
+import { Desplegable, type Opcion } from "@/components/desplegable";
 import { Cargando, ErrorPantalla, Vacio } from "@/components/estado-pantalla";
 import { EventoCard } from "@/components/evento-card";
 import { PantallaTab } from "@/components/pantalla-tab";
@@ -15,30 +15,44 @@ import { useDemorado } from "@/hooks/use-demorado";
 import { useTheme } from "@/hooks/use-theme";
 import { useUsuario } from "@/sesion/sesion-context";
 
-const ORDENES: { valor: OrdenEventos; texto: string; direccionPorDefecto: "asc" | "desc" }[] = [
-  { valor: "fecha", texto: "Fecha", direccionPorDefecto: "asc" },
-  { valor: "precio", texto: "Precio", direccionPorDefecto: "asc" },
-  { valor: "puntaje", texto: "Puntaje", direccionPorDefecto: "desc" },
+type Orden = `${OrdenEventos}-${"asc" | "desc"}`;
+
+// Cada opción ya trae el sentido, así no hace falta un botón aparte para invertir el orden
+const ORDENES: Opcion<Orden>[] = [
+  { valor: "fecha-asc", texto: "Más próximos" },
+  { valor: "fecha-desc", texto: "Más lejanos" },
+  { valor: "precio-asc", texto: "Menor precio" },
+  { valor: "precio-desc", texto: "Mayor precio" },
+  { valor: "puntaje-desc", texto: "Mejor puntuados" },
 ];
+const ORDEN_POR_DEFECTO: Orden = "fecha-asc";
 
 export default function ExplorarScreen() {
   const theme = useTheme();
   const usuario = useUsuario();
   const [texto, setTexto] = useState("");
   const [categoriaId, setCategoriaId] = useState<number | undefined>();
-  const [orden, setOrden] = useState<OrdenEventos>("fecha");
-  const [direccion, setDireccion] = useState<"asc" | "desc">("asc");
+  const [orden, setOrden] = useState<Orden>(ORDEN_POR_DEFECTO);
   const textoDemorado = useDemorado(texto.trim());
+  const [criterio, direccion] = orden.split("-") as [OrdenEventos, "asc" | "desc"];
 
   const categorias = useConsulta(listarCategorias);
   const eventos = useConsulta(
-    () => buscarEventos({ q: textoDemorado, categoriaId, orden, direccion }),
-    [textoDemorado, categoriaId, orden, direccion],
+    () => buscarEventos({ q: textoDemorado, categoriaId, orden: criterio, direccion }),
+    [textoDemorado, categoriaId, criterio, direccion],
   );
 
-  function elegirOrden(nuevo: (typeof ORDENES)[number]) {
-    setOrden(nuevo.valor);
-    setDireccion(nuevo.direccionPorDefecto);
+  const opcionesCategoria: Opcion<number | undefined>[] = [
+    { valor: undefined, texto: "Todas" },
+    ...(categorias.datos ?? []).map((categoria) => ({ valor: categoria.id, texto: categoria.nombre })),
+  ];
+  const hayFiltros = texto.trim() !== "" || categoriaId !== undefined || orden !== ORDEN_POR_DEFECTO;
+  const cantidad = eventos.datos?.length ?? 0;
+
+  function limpiarFiltros() {
+    setTexto("");
+    setCategoriaId(undefined);
+    setOrden(ORDEN_POR_DEFECTO);
   }
 
   const filtros = (
@@ -46,45 +60,44 @@ export default function ExplorarScreen() {
       <CampoTexto
         value={texto}
         onChangeText={setTexto}
-        placeholder="🔍  Buscá recitales, obras, charlas..."
+        placeholder="Buscá recitales, obras, charlas…"
         returnKeyType="search"
         clearButtonMode="while-editing"
         autoCorrect={false}
+        accessibilityLabel="Buscar eventos"
       />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fila}>
-        <Chip texto="Todas" activo={categoriaId === undefined} onPress={() => setCategoriaId(undefined)} />
-        {categorias.datos?.map((categoria) => (
-          <Chip
-            key={categoria.id}
-            texto={categoria.nombre}
-            activo={categoriaId === categoria.id}
-            onPress={() => setCategoriaId(categoriaId === categoria.id ? undefined : categoria.id)}
+      <View style={styles.fila}>
+        <View style={styles.flex}>
+          <Desplegable
+            compacto
+            etiqueta="Categoría"
+            titulo="Filtrar por categoría"
+            valor={categoriaId}
+            opciones={opcionesCategoria}
+            onCambiar={setCategoriaId}
           />
-        ))}
-      </ScrollView>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fila}>
-        <ThemedText type="etiqueta" themeColor="textSecondary" style={styles.etiqueta}>
-          Ordenar
-        </ThemedText>
-        {ORDENES.map((opcion) => (
-          <Chip
-            key={opcion.valor}
-            texto={opcion.texto}
-            activo={orden === opcion.valor}
-            onPress={() => elegirOrden(opcion)}
-          />
-        ))}
-        <Chip
-          texto={direccion === "asc" ? "↑ Ascendente" : "↓ Descendente"}
-          activo={false}
-          onPress={() => setDireccion(direccion === "asc" ? "desc" : "asc")}
-        />
-      </ScrollView>
+        </View>
+        <View style={styles.flex}>
+          <Desplegable compacto etiqueta="Ordenar por" valor={orden} opciones={ORDENES} onCambiar={setOrden} />
+        </View>
+      </View>
+      {!eventos.cargando && !eventos.error && (
+        <View style={styles.resumen}>
+          <ThemedText type="small" themeColor="textSecondary">
+            {cantidad === 1 ? "1 evento" : `${cantidad} eventos`}
+          </ThemedText>
+          {hayFiltros && (
+            <Pressable onPress={limpiarFiltros} hitSlop={8} accessibilityRole="button">
+              <ThemedText type="link">Limpiar filtros</ThemedText>
+            </Pressable>
+          )}
+        </View>
+      )}
     </View>
   );
 
   return (
-    <PantallaTab antetitulo={`Hola, ${usuario.nombre} 👋`} titulo="Tu próximo plan">
+    <PantallaTab titulo={`Hola, ${usuario.nombre}`} subtitulo="¿Qué plan tenés en mente?">
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={eventos.datos ?? []}
@@ -97,7 +110,7 @@ export default function ExplorarScreen() {
           ) : eventos.error ? (
             <ErrorPantalla mensaje={eventos.error} onReintentar={eventos.recargar} />
           ) : (
-            <Vacio titulo="No encontramos eventos" detalle="Probá con otra búsqueda o categoría." />
+            <Vacio emoji="🔍" titulo="No encontramos eventos" detalle="Probá con otra búsqueda o categoría." />
           )
         }
         contentContainerStyle={styles.lista}
@@ -113,19 +126,25 @@ export default function ExplorarScreen() {
 
 const styles = StyleSheet.create({
   lista: {
-    paddingHorizontal: Spacing.three + 4,
+    paddingHorizontal: Spacing.four - 4,
     paddingBottom: Spacing.five,
-    gap: Spacing.four - 4,
+    gap: Spacing.three - 4,
   },
   filtros: {
-    gap: Spacing.two + 4,
+    gap: Spacing.three - 4,
     marginBottom: Spacing.one,
   },
   fila: {
-    gap: Spacing.two,
-    alignItems: "center",
+    flexDirection: "row",
+    gap: Spacing.two + 2,
   },
-  etiqueta: {
-    marginRight: Spacing.one,
+  flex: {
+    flex: 1,
+  },
+  resumen: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: Spacing.one,
   },
 });

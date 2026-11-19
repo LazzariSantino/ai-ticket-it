@@ -24,7 +24,9 @@ export function partesDeFecha(fechaIso: string) {
   return {
     dia: String(fecha.getDate()),
     mes: fecha.toLocaleDateString("es-AR", { month: "short" }).replace(".", ""),
+    mesLargo: fecha.toLocaleDateString("es-AR", { month: "long" }),
     diaSemana: capitalizar(fecha.toLocaleDateString("es-AR", { weekday: "long" })),
+    diaSemanaCorto: capitalizar(fecha.toLocaleDateString("es-AR", { weekday: "short" }).replace(".", "")),
     hora: fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false }),
   };
 }

@@ -1,18 +1,19 @@
 import { Link } from "expo-router";
 import { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Boton } from "@/components/boton";
 import { CampoTexto } from "@/components/campo-texto";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Marquesina, Spacing, Tipografias } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { useSesion } from "@/sesion/sesion-context";
 
 export default function LoginScreen() {
   const { iniciarSesion } = useSesion();
-  const insets = useSafeAreaInsets();
+  const theme = useTheme();
   const [email, setEmail] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -31,22 +32,21 @@ export default function LoginScreen() {
 
   return (
     <ThemedView style={styles.flex}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView
-          contentContainerStyle={[styles.contenido, { paddingBottom: insets.bottom + Spacing.four }]}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* La marquesina de la boletería, con la marca */}
-          <View style={[styles.marquesina, { paddingTop: insets.top + Spacing.five }]}>
-            <View style={styles.logo}>
-              <Text style={styles.logoEmoji}>🎟️</Text>
+      <SafeAreaView style={styles.flex}>
+        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
+            <View style={styles.encabezado}>
+              <View style={[styles.logo, { backgroundColor: theme.primarioSuave }]}>
+                <Text style={styles.logoEmoji}>🎟️</Text>
+              </View>
+              <ThemedText type="title" style={styles.marca}>
+                AI Ticket It
+              </ThemedText>
+              <ThemedText themeColor="textSecondary" style={styles.centrado}>
+                Encontrá eventos cerca tuyo y{"\n"}tené tus entradas siempre a mano
+              </ThemedText>
             </View>
-            <Text style={styles.marca}>AI Ticket It</Text>
-            <Text style={styles.lema}>Recitales, teatro, festivales y charlas.{"\n"}Tu próximo plan está acá.</Text>
-          </View>
 
-          <View style={styles.formulario}>
-            <ThemedText type="subtitle">Entrá a tu cuenta</ThemedText>
             <CampoTexto
               etiqueta="Email"
               value={email}
@@ -66,19 +66,21 @@ export default function LoginScreen() {
             />
 
             {error && (
-              <ThemedText type="small" themeColor="peligro">
+              <ThemedText type="smallBold" themeColor="peligro">
                 {error}
               </ThemedText>
             )}
 
             <Boton titulo="Ingresar" onPress={ingresar} cargando={cargando} deshabilitado={!email || !contrasenia} />
 
-            <Link href="/registro" style={styles.centrado}>
-              <ThemedText type="link">¿No tenés cuenta? Registrate</ThemedText>
+            <Link href="/registro" style={styles.registro}>
+              <ThemedText themeColor="textSecondary">
+                ¿No tenés cuenta? <ThemedText type="link">Registrate</ThemedText>
+              </ThemedText>
             </Link>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </ThemedView>
   );
 }
@@ -89,50 +91,39 @@ const styles = StyleSheet.create({
   },
   contenido: {
     flexGrow: 1,
+    justifyContent: "center",
+    padding: Spacing.four,
+    gap: Spacing.three,
+    width: "100%",
+    maxWidth: 480,
+    alignSelf: "center",
   },
-  marquesina: {
+  encabezado: {
     alignItems: "center",
     gap: Spacing.two,
-    paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.five + 8,
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 36,
-    backgroundImage: Marquesina,
+    marginBottom: Spacing.four,
   },
   logo: {
-    width: 76,
-    height: 76,
-    borderRadius: 24,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.18)",
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.45)",
     marginBottom: Spacing.two,
   },
   logoEmoji: {
-    fontSize: 38,
-    lineHeight: 46,
+    fontSize: 40,
+    lineHeight: 48,
   },
   marca: {
-    color: "#FFFFFF",
-    fontFamily: Tipografias.titulo,
-    fontSize: 40,
-    lineHeight: 44,
-    letterSpacing: -1,
-  },
-  lema: {
-    color: "rgba(255, 255, 255, 0.88)",
-    fontSize: 16,
-    lineHeight: 23,
-    textAlign: "center",
-  },
-  formulario: {
-    flex: 1,
-    padding: Spacing.four,
-    gap: Spacing.three,
+    fontSize: 34,
+    lineHeight: 40,
   },
   centrado: {
+    textAlign: "center",
+  },
+  registro: {
     alignSelf: "center",
+    marginTop: Spacing.two,
   },
 });

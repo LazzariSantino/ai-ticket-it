@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const COLOR_ESTRELLA = "#F5A524";
+import { useTheme } from "@/hooks/use-theme";
 
 // Muestra un puntaje de 1 a 5. Si recibe onCambiar, las estrellas se pueden tocar para elegir el puntaje.
 export function Estrellas({
@@ -12,12 +12,13 @@ export function Estrellas({
   tamanio?: number;
   onCambiar?: (puntaje: number) => void;
 }) {
+  const theme = useTheme();
   return (
     <View style={styles.fila} accessibilityLabel={`${puntaje} de 5 estrellas`}>
       {[1, 2, 3, 4, 5].map((valor) => {
         const simbolo = valor <= Math.round(puntaje) ? "★" : "☆";
         const estrella = (
-          <Text key={valor} style={{ fontSize: tamanio, lineHeight: tamanio * 1.25, color: COLOR_ESTRELLA }}>
+          <Text key={valor} style={{ fontSize: tamanio, lineHeight: tamanio * 1.25, color: theme.estrella }}>
             {simbolo}
           </Text>
         );

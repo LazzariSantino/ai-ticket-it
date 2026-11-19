@@ -1,68 +1,63 @@
 import { Platform } from "react-native";
 
-// Identidad visual "noche de función": papel cálido y tinta de día, escenario oscuro de noche,
-// y una marquesina violeta → coral para lo que importa (comprar, el estado activo, los acentos)
+// Identidad visual "minimal suave": blanco y aire, un único acento azul petróleo, superficies planas
+// muy redondeadas (sin sombras ni degradés) y una tipografía redondeada en toda la app
 export const Colors = {
   light: {
-    text: "#1A1523",
-    background: "#F7F3EE",
-    backgroundElement: "#FFFFFF",
-    backgroundSelected: "#EFE9E1",
-    textSecondary: "#6E6779",
-    borde: "#E9E2D8",
-    primario: "#5B2EFF",
-    primarioSuave: "#EEE8FF",
-    acento: "#FF4D6D",
-    acentoSuave: "#FFE6EA",
+    text: "#15232D",
+    background: "#FFFFFF",
+    backgroundElement: "#F2F5F7",
+    backgroundSelected: "#E6ECEF",
+    textSecondary: "#687986",
+    borde: "#E3E9EC",
+    primario: "#0E7C86",
+    primarioSuave: "#E1F2F3",
+    acento: "#C76A1F",
+    acentoSuave: "#FCEFE2",
     sobrePrimario: "#FFFFFF",
-    tinta: "#1A1523",
-    sobreTinta: "#FFFFFF",
-    peligro: "#E5484D",
-    exito: "#12A150",
-    // Sombra cálida para las tarjetas (en modo oscuro alcanza con el borde)
-    sombra: "0px 10px 30px rgba(26, 21, 35, 0.08)",
+    peligro: "#D64545",
+    peligroSuave: "#FCEBEB",
+    exito: "#1E8E5A",
+    estrella: "#F2A93B",
+    velo: "rgba(13, 25, 33, 0.4)",
   },
   dark: {
-    text: "#F4F1FA",
-    background: "#100D18",
-    backgroundElement: "#1B1726",
-    backgroundSelected: "#272136",
-    textSecondary: "#A9A2B8",
-    borde: "#2C2639",
-    primario: "#9277FF",
-    primarioSuave: "#2A2147",
-    acento: "#FF6B85",
-    acentoSuave: "#3A1D29",
-    sobrePrimario: "#FFFFFF",
-    tinta: "#F4F1FA",
-    sobreTinta: "#100D18",
-    peligro: "#FF6369",
-    exito: "#3DD68C",
-    sombra: "0px 0px 0px rgba(0, 0, 0, 0)",
+    text: "#E8F0F2",
+    background: "#0F1518",
+    backgroundElement: "#182227",
+    backgroundSelected: "#223038",
+    textSecondary: "#93A4AE",
+    borde: "#25333B",
+    primario: "#52BAC4",
+    primarioSuave: "#14353A",
+    acento: "#F0A35E",
+    acentoSuave: "#3A2A1C",
+    sobrePrimario: "#0F1518",
+    peligro: "#FF7070",
+    peligroSuave: "#3A1E1E",
+    exito: "#4CC38A",
+    estrella: "#F5B85C",
+    velo: "rgba(0, 0, 0, 0.6)",
   },
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
-// El degradé de la marca, en sintaxis CSS (React Native lo dibuja nativo con backgroundImage)
-export const Marquesina = "linear-gradient(120deg, #5B2EFF 0%, #B23CFF 55%, #FF4D6D 100%)";
-// Oscurece la parte de abajo de una foto para que el texto blanco encima se lea bien
-export const VeloFoto = "linear-gradient(180deg, rgba(16,13,24,0) 35%, rgba(16,13,24,0.85) 100%)";
-
 // Cada estado de una compra tiene su color, para distinguirlos de un vistazo
 export const ColoresEstado = {
-  PENDIENTE: { fondo: "#FFF1D6", texto: "#8A5300", punto: "#F5A524" },
-  CONFIRMADA: { fondo: "#DCF7E7", texto: "#0E6B37", punto: "#12A150" },
-  UTILIZADA: { fondo: "#E4E8F8", texto: "#2F4589", punto: "#4F6BD8" },
-  CANCELADA: { fondo: "#FDE3E4", texto: "#A1262B", punto: "#E5484D" },
-  REEMBOLSADA: { fondo: "#F0E5FB", texto: "#6B2F9A", punto: "#9B51E0" },
+  PENDIENTE: { fondo: "#FFF3DC", texto: "#8A5A00" },
+  CONFIRMADA: { fondo: "#DFF3EA", texto: "#17734A" },
+  UTILIZADA: { fondo: "#E5EDF6", texto: "#2E5486" },
+  CANCELADA: { fondo: "#FBE6E6", texto: "#A23232" },
+  REEMBOLSADA: { fondo: "#EEE8F7", texto: "#5E3F8F" },
 } as const;
 
-// Bricolage Grotesque para títulos y números; el resto usa la fuente del sistema, que se lee mejor en tamaños chicos
+// Nunito en toda la app: con una fuente propia el peso va en el nombre de la fuente y no en fontWeight
 export const Tipografias = {
-  titulo: "Bricolage-ExtraBold",
-  subtitulo: "Bricolage-Bold",
-  destacado: "Bricolage-SemiBold",
+  titulo: "Nunito-ExtraBold",
+  subtitulo: "Nunito-Bold",
+  destacado: "Nunito-SemiBold",
+  texto: "Nunito-Regular",
 };
 
 export const Fonts = Platform.select({
@@ -97,6 +92,6 @@ export const Spacing = {
 } as const;
 
 export const Radio = 18;
-export const RadioGrande = 24;
+export const RadioGrande = 28;
 
 export const MaxContentWidth = 800;

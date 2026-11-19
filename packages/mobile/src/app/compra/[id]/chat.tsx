@@ -10,7 +10,7 @@ import { CampoTexto } from "@/components/campo-texto";
 import { Cargando, ErrorPantalla, Vacio } from "@/components/estado-pantalla";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Marquesina, Radio, Spacing } from "@/constants/theme";
+import { Radio, Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { useUsuario } from "@/sesion/sesion-context";
@@ -92,8 +92,8 @@ export default function ChatScreen() {
                 style={[
                   styles.burbuja,
                   propio
-                    ? [styles.propia, { backgroundColor: theme.primario, backgroundImage: Marquesina }]
-                    : [styles.ajena, { backgroundColor: theme.backgroundElement, borderColor: theme.borde }],
+                    ? [styles.propia, { backgroundColor: theme.primario }]
+                    : [styles.ajena, { backgroundColor: theme.backgroundElement }],
                 ]}
               >
                 {!propio && (
@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
   },
   ajena: {
     alignSelf: "flex-start",
-    borderWidth: 1,
     borderBottomLeftRadius: 4,
   },
   hora: {

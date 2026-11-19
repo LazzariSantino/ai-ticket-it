@@ -6,15 +6,14 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "r
 import { cancelar, marcarUtilizada, obtenerCompra, pagar } from "@/api/compras";
 import type { Compra } from "@/api/tipos";
 import { Boton } from "@/components/boton";
-import { EstadoBadge, textoEstado } from "@/components/estado-badge";
+import { textoEstado } from "@/components/estado-badge";
 import { Cargando, ErrorPantalla } from "@/components/estado-pantalla";
 import { FormularioResenia } from "@/components/formulario-resenia";
 import { ReseniaItem } from "@/components/resenia-item";
 import { Tarjeta } from "@/components/tarjeta";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Troquel } from "@/components/troquel";
-import { ColoresEstado, RadioGrande, Spacing, Tipografias, VeloFoto } from "@/constants/theme";
+import { ColoresEstado, Radio, RadioGrande, Spacing, Tipografias } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { useUsuario } from "@/sesion/sesion-context";
@@ -70,57 +69,62 @@ export default function CompraScreen() {
         contentContainerStyle={styles.contenido}
         refreshControl={<RefreshControl refreshing={recargando} onRefresh={recargar} tintColor={theme.primario} />}
       >
-        {/* La compra se muestra como la entrada: foto del evento, estado, troquel y el talón con los datos */}
-        <View
-          style={[
-            styles.entrada,
-            { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
+        <View style={[styles.estado, { backgroundColor: ColoresEstado[compra.estado].fondo }]}>
+          <Text style={[styles.estadoTexto, { color: ColoresEstado[compra.estado].texto }]}>
+            {textoEstado(compra.estado)}
+          </Text>
+          {compra.diasParaEvento !== null && (
+            <Text style={[styles.dias, { color: ColoresEstado[compra.estado].texto }]}>
+              {textoDiasParaEvento(compra.diasParaEvento)}
+            </Text>
+          )}
+        </View>
+
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push(`/evento/${compra.evento.id}`)}
+          style={({ pressed }) => [
+            styles.evento,
+            { backgroundColor: pressed ? theme.backgroundSelected : theme.backgroundElement },
           ]}
         >
-          <Pressable accessibilityRole="link" onPress={() => router.push(`/evento/${compra.evento.id}`)}>
-            <Image
-              source={compra.evento.multimedia[0]}
-              style={[styles.foto, { backgroundColor: theme.primarioSuave }]}
-              contentFit="cover"
-              transition={250}
-            />
-            <View style={[StyleSheet.absoluteFill, styles.velo]}>
-              <Text style={styles.evento} numberOfLines={2}>
-                {compra.evento.nombre}
-              </Text>
-              <Text style={styles.cuando}>{formatearFecha(compra.evento.fecha)} · Ver evento ›</Text>
-            </View>
-          </Pressable>
-
-          <View style={styles.estado}>
-            <EstadoBadge estado={compra.estado} grande />
-            {compra.diasParaEvento !== null && (
-              <ThemedText type="title" themeColor="acento" style={styles.dias}>
-                {textoDiasParaEvento(compra.diasParaEvento)}
-              </ThemedText>
-            )}
+          <Image
+            source={compra.evento.multimedia[0]}
+            style={[styles.foto, { backgroundColor: theme.primarioSuave }]}
+            contentFit="cover"
+            transition={200}
+          />
+          <View style={styles.flex}>
+            <ThemedText type="smallBold" style={styles.nombreEvento} numberOfLines={2}>
+              {compra.evento.nombre}
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              {formatearFecha(compra.evento.fecha)}
+            </ThemedText>
+            <ThemedText type="link">Ver evento ›</ThemedText>
           </View>
+        </Pressable>
 
-          <Troquel />
-
-          <View style={styles.talon}>
-            <View style={styles.grilla}>
-              <Dato etiqueta="Entrada" valor={compra.tipoEntrada.nombre} />
-              <Dato etiqueta="Cantidad" valor={String(compra.cantidad)} />
-              <Dato etiqueta="Precio unitario" valor={formatearPrecio(compra.tipoEntrada.precio)} />
-              <Dato etiqueta="Total" valor={formatearPrecio(compra.total)} destacado />
-              <Dato etiqueta="Comprador" valor={`${compra.comprador.nombre} ${compra.comprador.apellido}`} />
-              <Dato
-                etiqueta="Organiza"
-                valor={`${compra.evento.organizador.nombre} ${compra.evento.organizador.apellido}`}
-              />
-            </View>
-            <CodigoDeBarras semilla={compra.id} />
-            <ThemedText type="etiqueta" themeColor="textSecondary" style={styles.codigo}>
-              N.º {String(compra.id).padStart(6, "0")} · Comprada el {formatearFechaHora(compra.fecha)}
+        <Tarjeta titulo="Detalle de la compra">
+          <Fila etiqueta="Entrada" valor={compra.tipoEntrada.nombre} />
+          <Fila etiqueta="Cantidad" valor={String(compra.cantidad)} />
+          <Fila etiqueta="Precio unitario" valor={formatearPrecio(compra.tipoEntrada.precio)} />
+          <Fila etiqueta="Comprador" valor={`${compra.comprador.nombre} ${compra.comprador.apellido}`} />
+          <Fila
+            etiqueta="Organiza"
+            valor={`${compra.evento.organizador.nombre} ${compra.evento.organizador.apellido}`}
+          />
+          <View style={[styles.separador, { backgroundColor: theme.borde }]} />
+          <View style={styles.fila}>
+            <ThemedText type="smallBold">Total</ThemedText>
+            <ThemedText type="numero" themeColor="primario">
+              {formatearPrecio(compra.total)}
             </ThemedText>
           </View>
-        </View>
+        </Tarjeta>
+        <ThemedText type="small" themeColor="textSecondary" style={styles.aviso}>
+          Compra N.º {String(compra.id).padStart(6, "0")} · {formatearFechaHora(compra.fecha)}
+        </ThemedText>
 
         {compra.venceElPago && (
           <ThemedText type="small" themeColor="textSecondary" style={styles.aviso}>
@@ -144,7 +148,7 @@ export default function CompraScreen() {
         )}
         {soyOrganizador && compra.estado === "CONFIRMADA" && (
           <Boton
-            titulo="Validar entrada (marcar como utilizada)"
+            titulo="Validar entrada"
             onPress={() => ejecutar("usar", () => marcarUtilizada(compra.id))}
             cargando={accionEnCurso === "usar"}
           />
@@ -180,7 +184,7 @@ export default function CompraScreen() {
           {compra.historial.map((cambio, indice) => (
             <View key={indice} style={styles.cambio}>
               <View style={styles.linea}>
-                <View style={[styles.punto, { backgroundColor: ColoresEstado[cambio.estado].punto }]} />
+                <View style={[styles.punto, { backgroundColor: ColoresEstado[cambio.estado].texto }]} />
                 {indice < compra.historial.length - 1 && (
                   <View style={[styles.trazo, { backgroundColor: theme.borde }]} />
                 )}
@@ -202,28 +206,15 @@ export default function CompraScreen() {
   );
 }
 
-function Dato({ etiqueta, valor, destacado }: { etiqueta: string; valor: string; destacado?: boolean }) {
+function Fila({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
-    <View style={styles.dato}>
-      <ThemedText type="etiqueta" themeColor="textSecondary">
+    <View style={styles.fila}>
+      <ThemedText type="small" themeColor="textSecondary">
         {etiqueta}
       </ThemedText>
-      <ThemedText type={destacado ? "numero" : "smallBold"} themeColor={destacado ? "primario" : "text"}>
+      <ThemedText type="smallBold" style={styles.valor}>
         {valor}
       </ThemedText>
-    </View>
-  );
-}
-
-// Un código de barras decorativo, siempre igual para la misma compra (no se escanea: es parte del diseño de la entrada)
-function CodigoDeBarras({ semilla }: { semilla: number }) {
-  const theme = useTheme();
-  const barras = Array.from({ length: 42 }, (_, i) => 1 + ((semilla * 7 + i * 13 + ((i * i) % 5)) % 4));
-  return (
-    <View style={styles.barras} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {barras.map((ancho, i) => (
-        <View key={i} style={{ width: ancho, backgroundColor: i % 2 === 0 ? theme.text : "transparent" }} />
-      ))}
     </View>
   );
 }
@@ -233,69 +224,57 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contenido: {
-    padding: Spacing.three + 4,
-    gap: Spacing.three + 4,
+    padding: Spacing.four - 4,
+    gap: Spacing.three,
     paddingBottom: Spacing.six,
-  },
-  entrada: {
-    borderRadius: RadioGrande,
-    borderCurve: "continuous",
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  foto: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-  },
-  velo: {
-    justifyContent: "flex-end",
-    padding: Spacing.three,
-    backgroundImage: VeloFoto,
-  },
-  evento: {
-    color: "#FFFFFF",
-    fontFamily: Tipografias.titulo,
-    fontSize: 24,
-    lineHeight: 27,
-    letterSpacing: -0.4,
-  },
-  cuando: {
-    color: "rgba(255, 255, 255, 0.85)",
-    fontSize: 14,
-    fontWeight: 500,
   },
   estado: {
     alignItems: "center",
-    gap: Spacing.two,
-    paddingVertical: Spacing.four - 4,
+    gap: 2,
+    paddingVertical: Spacing.four,
     paddingHorizontal: Spacing.three,
+    borderRadius: RadioGrande,
+    borderCurve: "continuous",
+  },
+  estadoTexto: {
+    fontFamily: Tipografias.subtitulo,
+    fontSize: 16,
   },
   dias: {
+    fontFamily: Tipografias.titulo,
+    fontSize: 30,
+    lineHeight: 36,
     textAlign: "center",
   },
-  talon: {
-    padding: Spacing.three + 2,
+  evento: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.three - 2,
+    padding: Spacing.two + 2,
+    borderRadius: RadioGrande,
+    borderCurve: "continuous",
+  },
+  foto: {
+    width: 76,
+    height: 76,
+    borderRadius: Radio,
+  },
+  nombreEvento: {
+    fontSize: 16,
+    lineHeight: 21,
+  },
+  fila: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     gap: Spacing.three,
   },
-  grilla: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    rowGap: Spacing.three,
+  valor: {
+    flexShrink: 1,
+    textAlign: "right",
   },
-  dato: {
-    width: "50%",
-    gap: 2,
-    paddingRight: Spacing.two,
-  },
-  barras: {
-    flexDirection: "row",
-    justifyContent: "center",
-    height: 44,
-    gap: 1,
-    marginTop: Spacing.one,
-  },
-  codigo: {
-    textAlign: "center",
+  separador: {
+    height: StyleSheet.hairlineWidth,
   },
   aviso: {
     textAlign: "center",

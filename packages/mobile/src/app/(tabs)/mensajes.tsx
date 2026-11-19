@@ -30,7 +30,7 @@ export default function MensajesScreen() {
   );
 
   return (
-    <PantallaTab antetitulo="Conversaciones" titulo="Mensajes">
+    <PantallaTab titulo="Mensajes" subtitulo="Tus charlas con organizadores y compradores">
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={datos ?? []}
@@ -73,8 +73,7 @@ function Conversacion({ compra }: { compra: Compra }) {
       onPress={() => router.push(`/compra/${compra.id}/chat`)}
       style={({ pressed }) => [
         styles.fila,
-        { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
-        { transform: [{ scale: pressed ? 0.98 : 1 }] },
+        { backgroundColor: pressed ? theme.backgroundSelected : theme.backgroundElement },
       ]}
     >
       <Image
@@ -111,7 +110,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   lista: {
-    paddingHorizontal: Spacing.three + 4,
+    paddingHorizontal: Spacing.four - 4,
     paddingBottom: Spacing.five,
     gap: Spacing.two,
   },
@@ -122,7 +121,6 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: RadioGrande,
     borderCurve: "continuous",
-    borderWidth: 1,
   },
   imagen: {
     width: 52,

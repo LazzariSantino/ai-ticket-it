@@ -7,7 +7,7 @@ import { Boton } from "@/components/boton";
 import { Cargando, ErrorPantalla, Vacio } from "@/components/estado-pantalla";
 import { PantallaTab } from "@/components/pantalla-tab";
 import { ThemedText } from "@/components/themed-text";
-import { Marquesina, RadioGrande, Spacing } from "@/constants/theme";
+import { RadioGrande, Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { formatearFecha } from "@/utils/formato";
@@ -15,16 +15,23 @@ import { formatearFecha } from "@/utils/formato";
 export default function MisEventosScreen() {
   const theme = useTheme();
   const { datos, error, cargando, recargando, recargar } = useConsulta(listarMisEventos);
+  // Primero los que vienen (del más cercano al más lejano) y al final los que ya pasaron
+  const ahora = Date.now();
+  const eventos = [...(datos ?? [])].sort((a, b) => {
+    const aPaso = new Date(a.fecha).getTime() <= ahora;
+    const bPaso = new Date(b.fecha).getTime() <= ahora;
+    return aPaso === bPaso ? new Date(a.fecha).getTime() - new Date(b.fecha).getTime() : aPaso ? 1 : -1;
+  });
 
   return (
     <PantallaTab
-      antetitulo="Panel del organizador"
       titulo="Mis eventos"
+      subtitulo="Cómo van las ventas"
       accion={<Boton titulo="+ Crear" onPress={() => router.push("/crear-evento")} style={styles.crear} />}
     >
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
-        data={datos ?? []}
+        data={eventos}
         keyExtractor={(evento) => String(evento.id)}
         renderItem={({ item }) => <EventoOrganizado evento={item} />}
         ListEmptyComponent={
@@ -55,12 +62,11 @@ function EventoOrganizado({ evento }: { evento: Evento }) {
       onPress={() => router.push(`/evento/${evento.id}/compras`)}
       style={({ pressed }) => [
         styles.tarjeta,
-        { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
-        { transform: [{ scale: pressed ? 0.98 : 1 }] },
+        { backgroundColor: pressed ? theme.backgroundSelected : theme.backgroundElement },
       ]}
     >
       <View style={styles.encabezado}>
-        <ThemedText type="etiqueta" themeColor="acento">
+        <ThemedText type="etiqueta" themeColor="primario">
           {formatearFecha(evento.fecha)}
         </ThemedText>
         {finalizado && (
@@ -78,11 +84,11 @@ function EventoOrganizado({ evento }: { evento: Evento }) {
           {cupoTotal ? Math.round((vendidas / cupoTotal) * 100) : 0}%
         </ThemedText>
       </View>
-      <View style={[styles.barra, { backgroundColor: theme.backgroundSelected }]}>
+      <View style={[styles.barra, { backgroundColor: theme.background }]}>
         <View
           style={[
             styles.relleno,
-            { backgroundImage: Marquesina, width: `${cupoTotal ? Math.max((vendidas / cupoTotal) * 100, 2) : 0}%` },
+            { backgroundColor: theme.primario, width: `${cupoTotal ? Math.max((vendidas / cupoTotal) * 100, 2) : 0}%` },
           ]}
         />
       </View>
@@ -92,7 +98,7 @@ function EventoOrganizado({ evento }: { evento: Evento }) {
 
 const styles = StyleSheet.create({
   lista: {
-    paddingHorizontal: Spacing.three + 4,
+    paddingHorizontal: Spacing.four - 4,
     paddingBottom: Spacing.five,
     gap: Spacing.three,
   },
@@ -103,7 +109,6 @@ const styles = StyleSheet.create({
     padding: Spacing.three + 2,
     borderRadius: RadioGrande,
     borderCurve: "continuous",
-    borderWidth: 1,
     gap: Spacing.one + 2,
   },
   encabezado: {

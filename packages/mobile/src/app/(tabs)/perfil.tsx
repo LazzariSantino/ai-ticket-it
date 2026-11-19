@@ -1,13 +1,16 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { URL_API } from "@/api/cliente";
+import { listarMisCompras } from "@/api/compras";
 import { listarFavoritos } from "@/api/eventos";
+import { Avatar } from "@/components/avatar";
 import { Boton } from "@/components/boton";
-import { Cargando } from "@/components/estado-pantalla";
+import { Cargando, Vacio } from "@/components/estado-pantalla";
 import { EventoCard } from "@/components/evento-card";
 import { PantallaTab } from "@/components/pantalla-tab";
 import { ThemedText } from "@/components/themed-text";
-import { Marquesina, RadioGrande, Spacing, Tipografias } from "@/constants/theme";
+import { ThemedView } from "@/components/themed-view";
+import { RadioGrande, Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useSesion, useUsuario } from "@/sesion/sesion-context";
 
@@ -15,33 +18,30 @@ export default function PerfilScreen() {
   const usuario = useUsuario();
   const { cerrarSesion } = useSesion();
   const favoritos = useConsulta(listarFavoritos);
+  const compras = useConsulta(listarMisCompras);
+  const proximas = (compras.datos ?? []).filter((compra) => compra.diasParaEvento !== null).length;
 
   return (
-    <PantallaTab antetitulo="Tu cuenta" titulo="Perfil">
+    <PantallaTab titulo="Perfil" subtitulo="Tu cuenta y tus eventos guardados">
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.contenido}>
-        {/* El usuario se muestra como un pase de la boletería, con la marquesina de la marca */}
-        <View style={styles.pase}>
-          <View style={styles.paseArriba}>
-            <Text style={styles.paseEtiqueta}>AI Ticket It · Pase</Text>
-            <Text style={styles.paseEmoji}>🎟️</Text>
+        <ThemedView type="backgroundElement" style={styles.tarjeta}>
+          <Avatar nombre={usuario.nombre} apellido={usuario.apellido} tamanio={64} />
+          <View style={styles.flex}>
+            <ThemedText type="subtitle">
+              {usuario.nombre} {usuario.apellido}
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              {usuario.email}
+            </ThemedText>
           </View>
-          <View style={styles.paseUsuario}>
-            <View style={styles.avatar}>
-              <Text style={styles.iniciales}>
-                {usuario.nombre[0]}
-                {usuario.apellido[0]}
-              </Text>
-            </View>
-            <View style={styles.flex}>
-              <Text style={styles.nombre}>
-                {usuario.nombre} {usuario.apellido}
-              </Text>
-              <Text style={styles.email}>{usuario.email}</Text>
-            </View>
-          </View>
+        </ThemedView>
+
+        <View style={styles.indicadores}>
+          <Indicador valor={proximas} texto={proximas === 1 ? "evento por venir" : "eventos por venir"} />
+          <Indicador valor={favoritos.datos?.length ?? 0} texto="favoritos" />
         </View>
 
-        <ThemedText type="etiqueta" themeColor="textSecondary" style={styles.seccion}>
+        <ThemedText type="subtitle" style={styles.seccion}>
           Mis favoritos
         </ThemedText>
         {favoritos.cargando ? (
@@ -49,10 +49,10 @@ export default function PerfilScreen() {
         ) : favoritos.datos?.length ? (
           favoritos.datos.map((evento) => <EventoCard key={evento.id} evento={evento} />)
         ) : (
-          <ThemedText themeColor="textSecondary">Tocá el ♡ en un evento para guardarlo acá.</ThemedText>
+          <Vacio emoji="♡" titulo="Todavía no guardaste eventos" detalle="Tocá el ♡ en un evento para tenerlo acá." />
         )}
 
-        <Boton titulo="Cerrar sesión" variante="peligro" onPress={cerrarSesion} />
+        <Boton titulo="Cerrar sesión" variante="peligro" onPress={cerrarSesion} style={styles.salir} />
 
         <ThemedText type="small" themeColor="textSecondary" style={styles.servidor}>
           Servidor: {URL_API}
@@ -62,70 +62,51 @@ export default function PerfilScreen() {
   );
 }
 
+function Indicador({ valor, texto }: { valor: number; texto: string }) {
+  return (
+    <ThemedView type="primarioSuave" style={styles.indicador}>
+      <ThemedText type="title" themeColor="primario">
+        {valor}
+      </ThemedText>
+      <ThemedText type="small" themeColor="primario">
+        {texto}
+      </ThemedText>
+    </ThemedView>
+  );
+}
+
 const styles = StyleSheet.create({
   contenido: {
-    paddingHorizontal: Spacing.three + 4,
+    paddingHorizontal: Spacing.four - 4,
     paddingBottom: Spacing.five,
-    gap: Spacing.three,
+    gap: Spacing.three - 4,
   },
   flex: {
     flex: 1,
   },
-  pase: {
-    padding: Spacing.four - 4,
-    borderRadius: RadioGrande,
-    borderCurve: "continuous",
-    gap: Spacing.four,
-    backgroundImage: Marquesina,
-    boxShadow: "0px 14px 30px rgba(91, 46, 255, 0.3)",
-  },
-  paseArriba: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  paseEtiqueta: {
-    color: "rgba(255, 255, 255, 0.85)",
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-  },
-  paseEmoji: {
-    fontSize: 22,
-  },
-  paseUsuario: {
+  tarjeta: {
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.three,
+    padding: Spacing.four - 4,
+    borderRadius: RadioGrande,
+    borderCurve: "continuous",
   },
-  avatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+  indicadores: {
+    flexDirection: "row",
+    gap: Spacing.three - 4,
   },
-  iniciales: {
-    color: "#FFFFFF",
-    fontFamily: Tipografias.subtitulo,
-    fontSize: 20,
-  },
-  nombre: {
-    color: "#FFFFFF",
-    fontFamily: Tipografias.titulo,
-    fontSize: 24,
-    lineHeight: 28,
-  },
-  email: {
-    color: "rgba(255, 255, 255, 0.85)",
-    fontSize: 14,
+  indicador: {
+    flex: 1,
+    padding: Spacing.three,
+    borderRadius: RadioGrande,
+    borderCurve: "continuous",
   },
   seccion: {
-    marginTop: Spacing.two,
+    marginTop: Spacing.three,
+  },
+  salir: {
+    marginTop: Spacing.three,
   },
   servidor: {
     textAlign: "center",

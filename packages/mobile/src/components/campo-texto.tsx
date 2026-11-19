@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { StyleSheet, TextInput, View, type TextInputProps } from "react-native";
 
+import { useFondoDeCampo } from "@/components/tarjeta";
 import { ThemedText } from "@/components/themed-text";
-import { Radio, Spacing } from "@/constants/theme";
+import { Radio, Spacing, Tipografias } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
 type Props = TextInputProps & { etiqueta?: string; ayuda?: string };
 
+// Campo relleno, sin borde; al enfocarlo aparece un contorno del color principal
 export function CampoTexto({ etiqueta, ayuda, style, onFocus, onBlur, ...props }: Props) {
   const theme = useTheme();
+  const fondo = useFondoDeCampo();
   const [enfocado, setEnfocado] = useState(false);
 
   return (
     <View style={styles.contenedor}>
-      {etiqueta && <ThemedText type="smallBold">{etiqueta}</ThemedText>}
+      {etiqueta && <ThemedText type="etiqueta">{etiqueta}</ThemedText>}
       <TextInput
         placeholderTextColor={theme.textSecondary}
         onFocus={(e) => {
@@ -28,8 +31,8 @@ export function CampoTexto({ etiqueta, ayuda, style, onFocus, onBlur, ...props }
           styles.input,
           {
             color: theme.text,
-            backgroundColor: theme.backgroundElement,
-            borderColor: enfocado ? theme.primario : theme.borde,
+            backgroundColor: fondo,
+            borderColor: enfocado ? theme.primario : "transparent",
           },
           style,
         ]}
@@ -46,15 +49,16 @@ export function CampoTexto({ etiqueta, ayuda, style, onFocus, onBlur, ...props }
 
 const styles = StyleSheet.create({
   contenedor: {
-    gap: Spacing.one + 2,
+    gap: Spacing.two - 2,
   },
   input: {
-    minHeight: 50,
-    borderWidth: 1.5,
+    minHeight: 52,
+    borderWidth: 2,
     borderRadius: Radio,
     borderCurve: "continuous",
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two + 2,
+    fontFamily: Tipografias.texto,
     fontSize: 16,
   },
 });

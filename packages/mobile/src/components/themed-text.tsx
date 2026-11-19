@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, type TextProps } from "react-native";
+import { StyleSheet, Text, type TextProps } from "react-native";
 
 import { Fonts, ThemeColor, Tipografias } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
@@ -15,58 +15,52 @@ export function ThemedText({ style, type = "default", themeColor, ...rest }: The
   return <Text style={[{ color }, styles[type], style]} {...rest} />;
 }
 
-// Con una fuente propia no se indica fontWeight: el peso ya viene en el nombre de la fuente
 const styles = StyleSheet.create({
   default: {
+    fontFamily: Tipografias.texto,
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: 400,
   },
   title: {
     fontFamily: Tipografias.titulo,
-    fontSize: 32,
+    fontSize: 30,
     lineHeight: 36,
-    letterSpacing: -0.6,
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontFamily: Tipografias.subtitulo,
-    fontSize: 21,
+    fontSize: 20,
     lineHeight: 26,
-    letterSpacing: -0.3,
   },
   small: {
+    fontFamily: Tipografias.texto,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: 400,
   },
   smallBold: {
+    fontFamily: Tipografias.subtitulo,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: 600,
   },
   link: {
+    fontFamily: Tipografias.subtitulo,
     fontSize: 15,
     lineHeight: 22,
-    fontWeight: 600,
   },
-  // Rótulo en mayúsculas y espaciado, para categorías y encabezados de sección
+  // Rótulo chico de sección o de dato ("Entrada", "Total", "Reseñas")
   etiqueta: {
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: 700,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
+    fontFamily: Tipografias.destacado,
+    fontSize: 13,
+    lineHeight: 18,
   },
   // Precios, cantidades y fechas destacadas
   numero: {
-    fontFamily: Tipografias.subtitulo,
+    fontFamily: Tipografias.titulo,
     fontSize: 18,
-    lineHeight: 22,
-    letterSpacing: -0.2,
+    lineHeight: 23,
   },
   code: {
     fontFamily: Fonts.mono,
-    fontWeight: Platform.select({ android: 700 }) ?? 500,
     fontSize: 12,
   },
 });

@@ -1,6 +1,7 @@
-import { BricolageGrotesque_600SemiBold } from "@expo-google-fonts/bricolage-grotesque/600SemiBold";
-import { BricolageGrotesque_700Bold } from "@expo-google-fonts/bricolage-grotesque/700Bold";
-import { BricolageGrotesque_800ExtraBold } from "@expo-google-fonts/bricolage-grotesque/800ExtraBold";
+import { Nunito_400Regular } from "@expo-google-fonts/nunito/400Regular";
+import { Nunito_600SemiBold } from "@expo-google-fonts/nunito/600SemiBold";
+import { Nunito_700Bold } from "@expo-google-fonts/nunito/700Bold";
+import { Nunito_800ExtraBold } from "@expo-google-fonts/nunito/800ExtraBold";
 import { useFonts } from "expo-font";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -55,9 +56,10 @@ function Navegacion() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [fuentesListas, errorFuentes] = useFonts({
-    [Tipografias.titulo]: BricolageGrotesque_800ExtraBold,
-    [Tipografias.subtitulo]: BricolageGrotesque_700Bold,
-    [Tipografias.destacado]: BricolageGrotesque_600SemiBold,
+    [Tipografias.titulo]: Nunito_800ExtraBold,
+    [Tipografias.subtitulo]: Nunito_700Bold,
+    [Tipografias.destacado]: Nunito_600SemiBold,
+    [Tipografias.texto]: Nunito_400Regular,
   });
 
   // Si las fuentes fallan se sigue igual con la del sistema; sólo se espera mientras cargan

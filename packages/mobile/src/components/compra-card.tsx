@@ -5,16 +5,15 @@ import { Pressable, StyleSheet, View } from "react-native";
 import type { Compra } from "@/api/tipos";
 import { EstadoBadge } from "@/components/estado-badge";
 import { ThemedText } from "@/components/themed-text";
-import { Troquel } from "@/components/troquel";
-import { RadioGrande, Spacing } from "@/constants/theme";
+import { Radio, RadioGrande, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { formatearFecha, formatearPrecio, textoDiasParaEvento } from "@/utils/formato";
+import { formatearPrecio, partesDeFecha, textoDiasParaEvento } from "@/utils/formato";
 
-// Una compra se ve como una entrada con talón: a la izquierda el evento, y en el talón cuántas entradas son.
-// `vista` decide qué se destaca: el comprador ve el evento, el organizador ve quién compró.
+// `vista` decide qué se destaca: el comprador ve el evento, el organizador ve quién compró
 export function CompraCard({ compra, vista = "comprador" }: { compra: Compra; vista?: "comprador" | "organizador" }) {
   const theme = useTheme();
   const comprador = vista === "comprador";
+  const fecha = partesDeFecha(compra.evento.fecha);
 
   return (
     <Pressable
@@ -22,8 +21,7 @@ export function CompraCard({ compra, vista = "comprador" }: { compra: Compra; vi
       onPress={() => router.push(`/compra/${compra.id}`)}
       style={({ pressed }) => [
         styles.tarjeta,
-        { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
-        { transform: [{ scale: pressed ? 0.98 : 1 }] },
+        { backgroundColor: pressed ? theme.backgroundSelected : theme.backgroundElement },
       ]}
     >
       {comprador && (
@@ -36,34 +34,26 @@ export function CompraCard({ compra, vista = "comprador" }: { compra: Compra; vi
       )}
       <View style={styles.cuerpo}>
         <EstadoBadge estado={compra.estado} />
-        <ThemedText type="subtitle" style={styles.titulo} numberOfLines={2}>
+        <ThemedText type="smallBold" style={styles.titulo} numberOfLines={2}>
           {comprador ? compra.evento.nombre : `${compra.comprador.nombre} ${compra.comprador.apellido}`}
         </ThemedText>
         <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-          {comprador ? formatearFecha(compra.evento.fecha) : compra.tipoEntrada.nombre}
+          {compra.cantidad} × {compra.tipoEntrada.nombre} · {formatearPrecio(compra.total)}
         </ThemedText>
+        {comprador && (
+          <ThemedText type="small" themeColor="textSecondary">
+            {fecha.diaSemanaCorto} {fecha.dia} {fecha.mes} · {fecha.hora} h
+          </ThemedText>
+        )}
         {compra.diasParaEvento !== null && (
-          <View style={[styles.faltan, { backgroundColor: theme.acentoSuave }]}>
-            <ThemedText type="smallBold" themeColor="acento">
-              {textoDiasParaEvento(compra.diasParaEvento)}
-            </ThemedText>
-          </View>
+          <ThemedText type="smallBold" themeColor="acento">
+            {textoDiasParaEvento(compra.diasParaEvento)}
+          </ThemedText>
         )}
       </View>
-
-      <Troquel vertical />
-
-      <View style={styles.talon}>
-        <ThemedText type="title" style={styles.cantidad}>
-          {compra.cantidad}
-        </ThemedText>
-        <ThemedText type="etiqueta" themeColor="textSecondary">
-          {compra.cantidad === 1 ? "entrada" : "entradas"}
-        </ThemedText>
-        <ThemedText type="smallBold" themeColor="primario" style={styles.total}>
-          {formatearPrecio(compra.total)}
-        </ThemedText>
-      </View>
+      <ThemedText type="subtitle" themeColor="textSecondary" style={styles.flecha}>
+        ›
+      </ThemedText>
     </Pressable>
   );
 }
@@ -71,46 +61,28 @@ export function CompraCard({ compra, vista = "comprador" }: { compra: Compra; vi
 const styles = StyleSheet.create({
   tarjeta: {
     flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.three - 2,
+    padding: Spacing.two + 2,
     borderRadius: RadioGrande,
     borderCurve: "continuous",
-    borderWidth: 1,
-    overflow: "hidden",
   },
   imagen: {
-    width: 72,
+    width: 84,
+    height: 96,
+    borderRadius: Radio,
+    borderCurve: "continuous",
   },
   cuerpo: {
     flex: 1,
-    paddingVertical: Spacing.three,
-    paddingLeft: Spacing.three,
-    paddingRight: Spacing.one,
-    gap: Spacing.one,
+    gap: 3,
+    paddingVertical: Spacing.one,
   },
   titulo: {
-    fontSize: 17,
+    fontSize: 16,
     lineHeight: 21,
-    marginTop: 2,
   },
-  faltan: {
-    alignSelf: "flex-start",
-    paddingHorizontal: Spacing.two + 2,
-    paddingVertical: 3,
-    borderRadius: 999,
-    marginTop: Spacing.one,
-  },
-  talon: {
-    width: 76,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: Spacing.three,
-    paddingRight: Spacing.one,
-  },
-  cantidad: {
-    fontSize: 30,
-    lineHeight: 32,
-  },
-  total: {
-    marginTop: Spacing.one,
-    fontSize: 12,
+  flecha: {
+    paddingHorizontal: Spacing.one,
   },
 });

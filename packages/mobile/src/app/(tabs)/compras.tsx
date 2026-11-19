@@ -21,7 +21,7 @@ export default function MisComprasScreen() {
   const cantidad = (filtro: EstadoCompra) => (datos ?? []).filter((compra) => compra.estado === filtro).length;
 
   return (
-    <PantallaTab antetitulo="Tus entradas" titulo="Mis compras">
+    <PantallaTab titulo="Mis compras" subtitulo="Tus entradas, de la más nueva a la más vieja">
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={compras}
@@ -58,9 +58,9 @@ export default function MisComprasScreen() {
 
 const styles = StyleSheet.create({
   lista: {
-    paddingHorizontal: Spacing.three + 4,
+    paddingHorizontal: Spacing.four - 4,
     paddingBottom: Spacing.five,
-    gap: Spacing.three,
+    gap: Spacing.three - 4,
   },
   chips: {
     gap: Spacing.two,

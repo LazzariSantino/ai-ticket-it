@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, type ViewStyle } from "react-native";
 
-import { Marquesina, Radio, Spacing } from "@/constants/theme";
+import { Spacing, Tipografias } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
 type Props = {
@@ -12,16 +12,12 @@ type Props = {
   style?: ViewStyle;
 };
 
-// El botón principal lleva la marquesina de la marca; el secundario es suave y el de peligro, sólo un borde
+// Botones en forma de píldora: el principal lleno de color, el secundario y el de peligro con un fondo suave
 export function Boton({ titulo, onPress, variante = "primario", cargando, deshabilitado, style }: Props) {
   const theme = useTheme();
   const inactivo = deshabilitado || cargando;
 
-  const fondo = {
-    primario: { backgroundColor: theme.primario, backgroundImage: Marquesina },
-    secundario: { backgroundColor: theme.primarioSuave },
-    peligro: { backgroundColor: "transparent", borderWidth: 1.5, borderColor: theme.peligro },
-  }[variante];
+  const fondo = { primario: theme.primario, secundario: theme.primarioSuave, peligro: theme.peligroSuave }[variante];
   const texto = { primario: theme.sobrePrimario, secundario: theme.primario, peligro: theme.peligro }[variante];
 
   return (
@@ -32,9 +28,7 @@ export function Boton({ titulo, onPress, variante = "primario", cargando, deshab
       disabled={inactivo}
       style={({ pressed }) => [
         styles.boton,
-        fondo,
-        variante === "primario" && !inactivo && styles.brillo,
-        { opacity: inactivo ? 0.45 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
+        { backgroundColor: fondo, opacity: inactivo ? 0.45 : pressed ? 0.82 : 1 },
         style,
       ]}
     >
@@ -46,18 +40,14 @@ export function Boton({ titulo, onPress, variante = "primario", cargando, deshab
 const styles = StyleSheet.create({
   boton: {
     minHeight: 52,
-    borderRadius: Radio,
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: Spacing.four,
-    borderCurve: "continuous",
-  },
-  brillo: {
-    boxShadow: "0px 8px 20px rgba(91, 46, 255, 0.28)",
   },
   texto: {
+    fontFamily: Tipografias.subtitulo,
     fontSize: 16,
-    fontWeight: 700,
-    letterSpacing: 0.2,
+    textAlign: "center",
   },
 });
