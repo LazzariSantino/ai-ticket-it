@@ -1,0 +1,69 @@
+paths:
+  /imagenes:
+    post:
+      tags: [Imágenes]
+      summary: Subir una foto
+      description: >-
+        Guarda en memoria una foto elegida en la app (por ejemplo, desde la galería al crear un evento) y devuelve
+        su ruta, que después se usa en la multimedia del evento. La foto va en base64 y puede pesar hasta 8 MB.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tipo, datos]
+              properties:
+                tipo:
+                  type: string
+                  enum: [image/jpeg, image/png, image/webp, image/gif]
+                  example: image/jpeg
+                datos:
+                  type: string
+                  format: byte
+                  description: La imagen codificada en base64.
+      responses:
+        "201":
+          description: Foto guardada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: integer, example: 1 }
+                  url: { type: string, example: /imagenes/1 }
+        "400":
+          description: Faltan campos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          $ref: "#/components/responses/NoAutenticado"
+        "413":
+          description: El archivo es demasiado grande.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "422":
+          $ref: "#/components/responses/ReglaDeNegocio"
+  /imagenes/{id}:
+    get:
+      tags: [Imágenes]
+      summary: Ver una foto
+      description: Es pública, porque la app la muestra directamente en pantalla.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: La imagen, con su tipo (image/jpeg, image/png...).
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NoEncontrado"

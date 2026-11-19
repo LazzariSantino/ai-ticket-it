@@ -9,16 +9,19 @@ import { crearAuthRouter } from "./routes/Auth.routes.js";
 import { crearCategoriaRouter } from "./routes/Categoria.routes.js";
 import { crearEventoRouter } from "./routes/Evento.routes.js";
 import { crearCompraRouter, crearComprasDeEventoRouter } from "./routes/Compra.routes.js";
+import { crearImagenRouter } from "./routes/Imagen.routes.js";
 
 import { AuthController } from "./controllers/Auth.controller.js";
 import { CategoriaController } from "./controllers/Categoria.controller.js";
 import { EventoController } from "./controllers/Evento.controller.js";
 import { CompraController } from "./controllers/Compra.controller.js";
+import { ImagenController } from "./controllers/Imagen.controller.js";
 
 import { AuthService } from "./services/Auth.service.js";
 import { CategoriaService } from "./services/Categoria.service.js";
 import { EventoService } from "./services/Evento.service.js";
 import { CompraService } from "./services/Compra.service.js";
+import { ImagenService } from "./services/Imagen.service.js";
 
 import { UsuarioRepository } from "./repository/Usuario.repository.js";
 import { SesionRepository } from "./repository/Sesion.repository.js";
@@ -26,6 +29,7 @@ import { CategoriaRepository } from "./repository/Categoria.repository.js";
 import { EventoRepository } from "./repository/Evento.repository.js";
 import { ReseniaRepository } from "./repository/Resenia.repository.js";
 import { CompraRepository } from "./repository/Compra.repository.js";
+import { ImagenRepository } from "./repository/Imagen.repository.js";
 
 // Arma la aplicación sin levantar el servidor, así los tests pueden crear una instancia nueva cada vez.
 // `reloj` permite fijar "el momento actual" en los tests. Con `vencerPendientesCadaMs` se revisa cada ese tiempo
@@ -37,6 +41,9 @@ export async function crearApp({
   vencerPendientesCadaMs,
 } = {}) {
   const app = express();
+  // Las fotos llegan en base64 dentro del JSON (8 MB de imagen son unos 11 MB en base64): sólo /imagenes acepta
+  // cuerpos grandes, el resto de la API sigue con el límite común. El segundo parser no vuelve a leer lo ya leído.
+  app.use("/imagenes", express.json({ limit: "12mb" }));
   app.use(express.json());
   app.use(
     cors({
@@ -58,6 +65,7 @@ export async function crearApp({
   const eventoRepository = new EventoRepository();
   const reseniaRepository = new ReseniaRepository();
   const compraRepository = new CompraRepository();
+  const imagenRepository = new ImagenRepository();
 
   // Services
   // Las sesiones vencen con la hora real, no con el reloj de la aplicación que los tests mueven para simular fechas
@@ -73,6 +81,8 @@ export async function crearApp({
     plazoParaPagarEnMinutos,
   );
 
+  const imagenService = new ImagenService(imagenRepository);
+
   if (conDatosDePrueba) {
     await cargarDatosDePrueba(
       { usuarioRepository, categoriaRepository, eventoRepository, compraRepository, reseniaRepository },
@@ -85,6 +95,7 @@ export async function crearApp({
   const categoriaController = new CategoriaController(categoriaService);
   const eventoController = new EventoController(eventoService);
   const compraController = new CompraController(compraService);
+  const imagenController = new ImagenController(imagenService);
 
   // Routes
   const autenticar = crearMiddlewareAutenticar(authService);
@@ -93,6 +104,7 @@ export async function crearApp({
   app.use("/eventos/:eventoId/compras", crearComprasDeEventoRouter(compraController, autenticar));
   app.use("/eventos", crearEventoRouter(eventoController, autenticar));
   app.use("/compras", crearCompraRouter(compraController, autenticar));
+  app.use("/imagenes", crearImagenRouter(imagenController, autenticar));
 
   // Manejo de errores
   app.use(errorHandler);
