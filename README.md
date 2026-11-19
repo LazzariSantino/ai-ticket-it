@@ -109,7 +109,7 @@ Cualquier usuario puede comprar y también publicar eventos.
 
 **Como compradora** (`comprador@aiticketit.com`):
 
-- [ ] **Buscar y explorar**: en **Explorar**, buscá "bionica" (sin tilde) o "conferencia", filtrá por una categoría y ordená por Fecha, Precio y Puntaje (con la flecha cambiás el sentido).
+- [ ] **Buscar y explorar**: en **Explorar**, buscá "bionica" (sin tilde) o "conferencia", elegí una categoría en el desplegable **Categoría** y probá los órdenes de **Ordenar por** (más próximos, menor o mayor precio, mejor puntuados). **Limpiar filtros** vuelve todo a como estaba.
 - [ ] **Reseñas del organizador**: entrá a un evento de Martín y bajá hasta sus reseñas.
 - [ ] **Comprar sin superar el cupo**: en **Deep Purple en el Movistar Arena** elegí **VIP**. Quedan 2, así que el botón `+` no deja pasar de 2. En otros tipos el tope es 10 por compra.
 - [ ] **Favoritos**: tocá el ♡ arriba a la derecha de un evento y fijate que aparezca en **Perfil**.
@@ -126,7 +126,7 @@ Cualquier usuario puede comprar y también publicar eventos.
 - [ ] **Compras de un evento**: en **Mis eventos** tocá **Stand up: Fede Simonetti**. Vas a ver las compras por estado y cuántas entradas quedan de cada tipo.
 - [ ] **Validar una entrada**: abrí la compra de Lucía del Stand up y tocá **Validar entrada**. Queda Utilizada.
 - [ ] **Responder el chat**: en **Mis eventos → Tan Biónica en el Movistar Arena**, abrí la compra de Lucía, entrá al chat y respondé.
-- [ ] **Crear un evento**: en **Mis eventos** tocá **+ Crear**. Completá nombre, descripción, categoría, una fecha futura (`AAAA-MM-DD`), la hora y al menos dos tipos de entrada con precio y cupo. Después buscalo en **Explorar**.
+- [ ] **Crear un evento**: en **Mis eventos** tocá **+ Crear**. Completá nombre y descripción, elegí la categoría en el desplegable, el día en el calendario (los días pasados no se pueden elegir), la hora en el desplegable y cargá al menos dos tipos de entrada con precio y cupo. Después buscalo en **Explorar**.
 - [ ] **No podés comprar tu propio evento**: en el detalle de un evento tuyo no aparece la compra, sino "Ver compras del evento".
 
 Con dos celulares (o celular y navegador), uno con cada usuario, se ve el chat en vivo: los mensajes nuevos llegan solos cada 5 segundos.
