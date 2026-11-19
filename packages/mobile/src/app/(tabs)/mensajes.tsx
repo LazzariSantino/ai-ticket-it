@@ -81,6 +81,7 @@ function Conversacion({ compra }: { compra: Compra }) {
         source={urlImagen(compra.evento.multimedia[0])}
         style={[styles.imagen, { backgroundColor: theme.primarioSuave }]}
         contentFit="cover"
+        contentPosition="top"
       />
       <View style={styles.cuerpo}>
         <View style={styles.encabezado}>

@@ -5,10 +5,11 @@ import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } fr
 
 import { urlImagen } from "@/api/cliente";
 import { comprar } from "@/api/compras";
-import { agregarFavorito, obtenerEvento, quitarFavorito } from "@/api/eventos";
+import { obtenerEvento } from "@/api/eventos";
 import type { TipoEntrada } from "@/api/tipos";
 import { Avatar } from "@/components/avatar";
 import { Boton } from "@/components/boton";
+import { BotonIcono } from "@/components/boton-icono";
 import { Cargando, ErrorPantalla } from "@/components/estado-pantalla";
 import { Estrellas } from "@/components/estrellas";
 import { ReseniaItem } from "@/components/resenia-item";
@@ -17,8 +18,9 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Radio, RadioGrande, Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
+import { useFavorito } from "@/hooks/use-favorito";
 import { useTheme } from "@/hooks/use-theme";
-import { useSesion } from "@/sesion/sesion-context";
+import { compartirEvento } from "@/utils/compartir";
 import { formatearPrecio, partesDeFecha } from "@/utils/formato";
 
 // Margen lateral de la pantalla: la foto ocupa el ancho que queda
@@ -32,8 +34,8 @@ export default function EventoScreen() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const anchoFoto = width - MARGEN * 2;
-  const { actualizarUsuario } = useSesion();
-  const { datos: evento, setDatos, error, cargando, recargar } = useConsulta(() => obtenerEvento(id), [id]);
+  const favorito = useFavorito(Number(id));
+  const { datos: evento, error, cargando, recargar } = useConsulta(() => obtenerEvento(id), [id]);
 
   // Se guarda el id y no el tipo: así, si se recarga el evento (por ejemplo, después de una compra fallida),
   // el cupo disponible que se usa es el actualizado y no una copia vieja
@@ -41,8 +43,6 @@ export default function EventoScreen() {
   const [cantidadElegida, setCantidad] = useState(1);
   const [comprando, setComprando] = useState(false);
   const [errorCompra, setErrorCompra] = useState<string | null>(null);
-  const [guardandoFavorito, setGuardandoFavorito] = useState(false);
-  const [errorFavorito, setErrorFavorito] = useState<string | null>(null);
   const [foto, setFoto] = useState(0);
 
   if (cargando) return <Cargando />;
@@ -58,21 +58,6 @@ export default function EventoScreen() {
     setTipoElegidoId(tipo.id);
     setCantidad(1);
     setErrorCompra(null);
-  }
-
-  async function alternarFavorito() {
-    if (!evento || guardandoFavorito) return;
-    setGuardandoFavorito(true);
-    setErrorFavorito(null);
-    try {
-      const usuario = evento.esFavorito ? await quitarFavorito(evento.id) : await agregarFavorito(evento.id);
-      actualizarUsuario(usuario);
-      setDatos({ ...evento, esFavorito: !evento.esFavorito });
-    } catch (e) {
-      setErrorFavorito(e instanceof Error ? e.message : "No se pudo actualizar el favorito");
-    } finally {
-      setGuardandoFavorito(false);
-    }
   }
 
   async function confirmarCompra() {
@@ -95,16 +80,20 @@ export default function EventoScreen() {
         options={{
           title: "",
           headerRight: () => (
-            <Pressable
-              onPress={alternarFavorito}
-              hitSlop={10}
-              accessibilityRole="button"
-              accessibilityLabel={evento.esFavorito ? "Quitar de favoritos" : "Guardar en favoritos"}
-            >
-              <Text style={[styles.corazon, { color: evento.esFavorito ? theme.peligro : theme.text }]}>
-                {evento.esFavorito ? "♥" : "♡"}
-              </Text>
-            </Pressable>
+            <View style={styles.acciones}>
+              <BotonIcono
+                icono="share-outline"
+                etiqueta="Compartir el evento"
+                onPress={() => compartirEvento(evento)}
+              />
+              <BotonIcono
+                icono={favorito.esFavorito ? "heart" : "heart-outline"}
+                etiqueta={favorito.esFavorito ? "Quitar de favoritos" : "Guardar en favoritos"}
+                activo={favorito.esFavorito}
+                color={favorito.esFavorito ? theme.peligro : undefined}
+                onPress={favorito.alternar}
+              />
+            </View>
           ),
         }}
       />
@@ -123,6 +112,7 @@ export default function EventoScreen() {
                 source={urlImagen(url)}
                 style={[styles.imagen, { width: anchoFoto, backgroundColor: theme.primarioSuave }]}
                 contentFit="cover"
+                contentPosition="top"
                 transition={250}
               />
             ))}
@@ -179,9 +169,9 @@ export default function EventoScreen() {
           </View>
         </Tarjeta>
 
-        {errorFavorito && (
+        {favorito.error && (
           <ThemedText type="small" themeColor="peligro">
-            {errorFavorito}
+            {favorito.error}
           </ThemedText>
         )}
         <ThemedText style={styles.descripcion}>{evento.descripcion}</ThemedText>
@@ -398,9 +388,9 @@ const styles = StyleSheet.create({
   descripcion: {
     lineHeight: 25,
   },
-  corazon: {
-    fontSize: 26,
-    lineHeight: 30,
+  acciones: {
+    flexDirection: "row",
+    gap: Spacing.two,
   },
   puntaje: {
     flexDirection: "row",

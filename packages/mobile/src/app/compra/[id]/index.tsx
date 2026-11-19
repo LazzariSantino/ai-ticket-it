@@ -94,6 +94,7 @@ export default function CompraScreen() {
             source={urlImagen(compra.evento.multimedia[0])}
             style={[styles.foto, { backgroundColor: theme.primarioSuave }]}
             contentFit="cover"
+            contentPosition="top"
             transition={200}
           />
           <View style={styles.flex}>

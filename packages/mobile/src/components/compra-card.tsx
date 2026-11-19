@@ -30,6 +30,7 @@ export function CompraCard({ compra, vista = "comprador" }: { compra: Compra; vi
           source={urlImagen(compra.evento.multimedia[0])}
           style={[styles.imagen, { backgroundColor: theme.primarioSuave }]}
           contentFit="cover"
+          contentPosition="top"
           transition={200}
         />
       )}
