@@ -9,6 +9,7 @@ import { Boton } from "@/components/boton";
 import { textoEstado } from "@/components/estado-badge";
 import { Cargando, ErrorPantalla } from "@/components/estado-pantalla";
 import { FormularioResenia } from "@/components/formulario-resenia";
+import { RecorridoEstados } from "@/components/recorrido-estados";
 import { ReseniaItem } from "@/components/resenia-item";
 import { Tarjeta } from "@/components/tarjeta";
 import { ThemedText } from "@/components/themed-text";
@@ -180,26 +181,8 @@ export default function CompraScreen() {
           onPress={() => router.push(`/compra/${compra.id}/chat`)}
         />
 
-        <Tarjeta titulo="Historial">
-          {compra.historial.map((cambio, indice) => (
-            <View key={indice} style={styles.cambio}>
-              <View style={styles.linea}>
-                <View style={[styles.punto, { backgroundColor: ColoresEstado[cambio.estado].texto }]} />
-                {indice < compra.historial.length - 1 && (
-                  <View style={[styles.trazo, { backgroundColor: theme.borde }]} />
-                )}
-              </View>
-              <View style={[styles.flex, styles.cambioTexto]}>
-                <ThemedText type="smallBold">{textoEstado(cambio.estado)}</ThemedText>
-                <ThemedText type="small" themeColor="textSecondary">
-                  {formatearFechaHora(cambio.fechaHora)} ·{" "}
-                  {cambio.quien
-                    ? `${cambio.quien.nombre} ${cambio.quien.apellido}`
-                    : "Sistema (venció el plazo de pago)"}
-                </ThemedText>
-              </View>
-            </View>
-          ))}
+        <Tarjeta titulo="Recorrido de la compra">
+          <RecorridoEstados historial={compra.historial} estadoActual={compra.estado} />
         </Tarjeta>
       </ScrollView>
     </ThemedView>
@@ -278,27 +261,5 @@ const styles = StyleSheet.create({
   },
   aviso: {
     textAlign: "center",
-  },
-  cambio: {
-    flexDirection: "row",
-    gap: Spacing.three,
-  },
-  linea: {
-    alignItems: "center",
-    width: 12,
-  },
-  punto: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginTop: 4,
-  },
-  trazo: {
-    width: 2,
-    flex: 1,
-    marginTop: 4,
-  },
-  cambioTexto: {
-    paddingBottom: Spacing.three,
   },
 });
