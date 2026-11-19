@@ -39,7 +39,7 @@ describe("Datos de prueba", () => {
       .get("/eventos?orden=puntaje")
       .set("Authorization", await login("comprador@aiticketit.com"));
 
-    expect(eventos.body[0].organizador).toMatchObject({ nombre: "Martín", puntaje: 4.5, cantidadResenias: 2 });
+    expect(eventos.body[0].organizador).toMatchObject({ nombre: "Martín", puntaje: 4.3, cantidadResenias: 3 });
     expect(eventos.body.map((evento) => evento.nombre)).not.toContain("Ekoparty 2026");
   });
 

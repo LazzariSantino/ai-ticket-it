@@ -28,6 +28,8 @@ export async function cargarDatosDePrueba(
   const martin = await usuario("Martín", "Rodríguez", "organizador@aiticketit.com");
   const carla = await usuario("Carla", "Fernández", "productora@aiticketit.com");
   const tomas = await usuario("Tomás", "Ibarra", "tomas@aiticketit.com");
+  const sofia = await usuario("Sofía", "Benítez", "sofia@aiticketit.com");
+  const nicolas = await usuario("Nicolás", "Paz", "nicolas@aiticketit.com");
 
   // --- Eventos ---
   // Son eventos reales de Buenos Aires (2026 y 2027). Las fechas se acomodan alrededor del arranque del servidor
@@ -226,14 +228,36 @@ export async function cargarDatosDePrueba(
     lucia,
     ekoparty,
     4,
-    "Muy buenas charlas de hacking y el CTF estuvo genial, aunque las filas eran largas.",
+    "Fui por primera vez y salí con la cabeza explotada, la charla de hardware hacking fue lo mejor del día. " +
+      "Le saco una estrella porque la fila del viernes a la mañana daba la vuelta a la manzana y el café se terminó a las 11.",
   );
-  await asistir(tomas, ekoparty, 5, "Organización perfecta, empezó puntual y los talleres valieron cada peso.");
+  await asistir(
+    tomas,
+    ekoparty,
+    5,
+    "Tercer año que voy y cada vez está mejor. Me anoté al CTF con dos amigos de la facu, terminamos 14° y nos " +
+      "divertimos como nunca. Los talleres tienen cupo, así que si querés uno llegá temprano.",
+  );
+  await asistir(
+    nicolas,
+    ekoparty,
+    4,
+    "Muy buen nivel. Algunas charlas me pasaron por arriba, pero igual se aprende un montón escuchando. " +
+      "El sábado el lugar quedó chico y había gente sentada en el piso de los pasillos.",
+  );
   await asistir(
     tomas,
     nerdearla,
     3.5,
-    "Charlas de primer nivel sobre IA y open source, pero las salas se llenaban rápido.",
+    "Las charlas de IA estuvieron buenísimas y encima es gratis, así que mucho no me puedo quejar. Pero las salas " +
+      "chicas se llenaban 15 minutos antes y me quedé afuera de dos que quería ver.",
+  );
+  await asistir(
+    sofia,
+    nerdearla,
+    4.5,
+    "No puedo creer que algo así sea gratis. Conocí gente de un montón de empresas, me llevé stickers para toda la " +
+      "notebook y la charla del creador de SQLite fue de otro planeta. El año que viene vuelvo seguro.",
   );
   // Lucía fue a Nerdearla y todavía no la reseñó: sirve para probar la reseña desde la app
   await asistir(lucia, nerdearla);

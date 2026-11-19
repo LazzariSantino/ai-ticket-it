@@ -88,6 +88,8 @@ Todos con la contraseña **`123456`**. La app no los muestra en el login: hay qu
 | `organizador@aiticketit.com` | Martín Rodríguez | Organiza Tan Biónica, Deep Purple, el Stand up de hoy y Ekoparty 2026 (ya pasó)                                           |
 | `productora@aiticketit.com`  | Carla Fernández  | Organiza Un Poyo Rojo, el Encuentro de Telecomunicaciones, Lollapalooza 2027, la final del Clausura y Nerdearla (ya pasó) |
 | `tomas@aiticketit.com`       | Tomás Ibarra     | Compras confirmadas para Tan Biónica y el Stand up de hoy; reseñó Ekoparty y Nerdearla                                    |
+| `sofia@aiticketit.com`       | Sofía Benítez    | Reseñó Nerdearla                                                                                                          |
+| `nicolas@aiticketit.com`     | Nicolás Paz      | Reseñó Ekoparty                                                                                                           |
 
 Las compras de Lucía:
 
