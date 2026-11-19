@@ -69,12 +69,20 @@ paths:
       security: [{ bearerAuth: [] }]
       responses:
         "200":
-          description: Las compras con chat, cada una con su `ultimoMensaje`.
+          description: Las compras con chat, cada una con su `ultimoMensaje` y los `mensajesSinLeer` del usuario.
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/Compra" }
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/Compra"
+                    - type: object
+                      properties:
+                        mensajesSinLeer:
+                          type: integer
+                          description: Mensajes de la otra persona que el usuario todavía no vio.
+                          example: 1
         "401":
           $ref: "#/components/responses/NoAutenticado"
   /eventos/{eventoId}/compras:
@@ -204,7 +212,9 @@ paths:
     get:
       tags: [Compras]
       summary: Chat de la compra
-      description: Con `desde` devuelve sólo los mensajes a partir de esa posición, para pedir únicamente los nuevos.
+      description: >-
+        Con `desde` devuelve sólo los mensajes a partir de esa posición, para pedir únicamente los nuevos.
+        Pedir los mensajes deja el chat como leído para el usuario logueado.
       security: [{ bearerAuth: [] }]
       parameters:
         - { in: path, name: id, required: true, schema: { type: integer } }

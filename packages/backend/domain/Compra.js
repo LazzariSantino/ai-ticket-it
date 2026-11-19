@@ -37,6 +37,8 @@ export class Compra {
     this.venceElPago = new Date(fecha.getTime() + plazoParaPagarEnMinutos * 60 * 1000);
     this.estado = EstadoCompra.PENDIENTE;
     this.mensajes = [];
+    // Hasta qué mensaje leyó cada participante del chat: id del usuario → cantidad de mensajes vistos
+    this.leidosPor = new Map();
     this.resenia = null;
     this.historial = [
       new CambioEstadoCompra({ compra: this, estado: this.estado, quien: comprador, fechaHora: fecha }),
@@ -162,7 +164,18 @@ export class Compra {
     }
     const mensaje = new Mensaje({ usuario, mensaje: texto, enviado: ahora });
     this.mensajes.push(mensaje);
+    // Quien escribe tiene el chat abierto, así que ya vio todo lo anterior
+    this.marcarMensajesLeidos(usuario);
     return mensaje;
+  }
+
+  marcarMensajesLeidos(usuario) {
+    this.leidosPor.set(usuario.id, this.mensajes.length);
+  }
+
+  mensajesSinLeer(usuario) {
+    const leidos = this.leidosPor.get(usuario.id) ?? 0;
+    return this.mensajes.slice(leidos).filter((mensaje) => mensaje.usuario.id !== usuario.id).length;
   }
 
   puedeSerReseniada() {

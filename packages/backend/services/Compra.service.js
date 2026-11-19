@@ -97,8 +97,11 @@ export class CompraService {
 
   // Los mensajes sólo se agregan al final, así que `desde` (la cantidad que la app ya tiene) alcanza
   // para devolver únicamente los nuevos
+  // Pedir los mensajes es tener el chat abierto: quedan todos como leídos para ese usuario
   async listarMensajes(usuario, compraId, { desde = 0 } = {}) {
     const compra = await this.obtenerCompra(usuario, compraId);
+    compra.marcarMensajesLeidos(usuario);
+    await this._compraRepository.guardar(compra);
     return compra.mensajes.slice(desde);
   }
 

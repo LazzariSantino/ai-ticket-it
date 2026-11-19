@@ -28,9 +28,16 @@ export class CompraController {
     return res.status(200).json(await this.presentarTodas(compras));
   }
 
+  // Cada chat lleva cuántos mensajes no leyó el usuario logueado (depende de quién pregunta)
   async listarChats(req, res) {
     const compras = await this.compraService.listarChats(req.usuario);
-    return res.status(200).json(await this.presentarTodas(compras));
+    const chats = await Promise.all(
+      compras.map(async (compra) => ({
+        ...(await this.presentar(compra)),
+        mensajesSinLeer: compra.mensajesSinLeer(req.usuario),
+      })),
+    );
+    return res.status(200).json(chats);
   }
 
   async listarComprasDeEvento(req, res) {

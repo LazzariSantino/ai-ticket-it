@@ -153,6 +153,22 @@ describe("API: /compras", () => {
     expect(deOtro.body).toEqual([]);
   });
 
+  it("GET /compras/chats dice cuántos mensajes no leyó cada uno, y abrir el chat los marca como leídos", async () => {
+    const { body: compra } = await comprar(1);
+    const chatsDe = async (auth) => (await request(app).get("/compras/chats").set("Authorization", auth)).body;
+    await request(app)
+      .post(`/compras/${compra.id}/mensajes`)
+      .set("Authorization", compradora)
+      .send({ mensaje: "¿Hay guardarropa?" });
+
+    expect((await chatsDe(organizadora))[0].mensajesSinLeer).toBe(1);
+    expect((await chatsDe(compradora))[0].mensajesSinLeer).toBe(0);
+
+    await request(app).get(`/compras/${compra.id}/mensajes`).set("Authorization", organizadora);
+
+    expect((await chatsDe(organizadora))[0].mensajesSinLeer).toBe(0);
+  });
+
   it("comprador y organizador chatean dentro de la compra, aun cancelada", async () => {
     const { body: compra } = await comprar();
     await request(app).post(`/compras/${compra.id}/cancelacion`).set("Authorization", compradora);

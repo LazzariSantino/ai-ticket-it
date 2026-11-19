@@ -307,5 +307,20 @@ describe("Dominio: Compra", () => {
     it("no se pueden enviar mensajes vacíos", () => {
       expect(() => comprar().enviarMensaje(compradora, "   ")).toThrow("El mensaje no puede estar vacío");
     });
+
+    it("cuenta los mensajes que cada uno todavía no leyó, sin contar los propios", () => {
+      const compra = comprar();
+      compra.enviarMensaje(compradora, "¿Hay guardarropa?", antesDelEvento);
+      compra.enviarMensaje(compradora, "¿Y estacionamiento?", antesDelEvento);
+
+      expect(compra.mensajesSinLeer(organizadora)).toBe(2);
+      expect(compra.mensajesSinLeer(compradora)).toBe(0);
+
+      compra.marcarMensajesLeidos(organizadora);
+      compra.enviarMensaje(organizadora, "Sí, los dos", antesDelEvento);
+
+      expect(compra.mensajesSinLeer(organizadora)).toBe(0);
+      expect(compra.mensajesSinLeer(compradora)).toBe(1);
+    });
   });
 });
