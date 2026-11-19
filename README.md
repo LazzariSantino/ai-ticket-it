@@ -82,24 +82,24 @@ En el navegador las pestañas aparecen arriba en vez de abajo, y si recargás la
 
 Todos con la contraseña **`123456`**. En la pantalla de login, tocando el email de un usuario se completan los datos solos.
 
-| Email                        | Quién es         | Qué tiene cargado                                                                                             |
-| ---------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `comprador@aiticketit.com`   | Lucía Gómez      | Compras en todos los estados (detalle abajo)                                                                  |
-| `organizador@aiticketit.com` | Martín Rodríguez | Organiza Noche de Jazz, Rock en el Galpón, el Stand up de hoy y Tango bajo las estrellas (ya pasó)            |
-| `productora@aiticketit.com`  | Carla Fernández  | Organiza Hamlet, la conferencia de IA, Festival Río Sonoro, la final de básquet y Monólogos del Sur (ya pasó) |
-| `tomas@aiticketit.com`       | Tomás Ibarra     | Compras confirmadas para Jazz y el Stand up de hoy; reseñó Tango y Monólogos                                  |
+| Email                        | Quién es         | Qué tiene cargado                                                                                                         |
+| ---------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `comprador@aiticketit.com`   | Lucía Gómez      | Compras en todos los estados (detalle abajo)                                                                              |
+| `organizador@aiticketit.com` | Martín Rodríguez | Organiza Tan Biónica, Deep Purple, el Stand up de hoy y Ekoparty 2026 (ya pasó)                                           |
+| `productora@aiticketit.com`  | Carla Fernández  | Organiza Un Poyo Rojo, el Encuentro de Telecomunicaciones, Lollapalooza 2027, la final del Clausura y Nerdearla (ya pasó) |
+| `tomas@aiticketit.com`       | Tomás Ibarra     | Compras confirmadas para Tan Biónica y el Stand up de hoy; reseñó Ekoparty y Nerdearla                                    |
 
 Las compras de Lucía:
 
-| Evento                          | Estado                      | Para probar                                                |
-| ------------------------------- | --------------------------- | ---------------------------------------------------------- |
-| Noche de Jazz en San Telmo      | Confirmada (faltan 12 días) | Días que faltan, chat con mensajes, cancelar con reembolso |
-| Rock en el Galpón               | Pendiente de pago           | Pagar, y el plazo para pagar (24 horas)                    |
-| Stand up: Risas de Viernes      | Confirmada (es hoy)         | Que el organizador valide la entrada                       |
-| Hamlet                          | Reembolsada                 | Historial de estados                                       |
-| IA en el desarrollo de software | Cancelada                   | Compra cancelada sin pagar                                 |
-| Tango bajo las estrellas        | Utilizada, ya reseñada      | Ver una reseña hecha                                       |
-| Monólogos del Sur               | Utilizada, sin reseñar      | Dejar una reseña                                           |
+| Evento                           | Estado                      | Para probar                                                |
+| -------------------------------- | --------------------------- | ---------------------------------------------------------- |
+| Tan Biónica en el Movistar Arena | Confirmada (faltan 12 días) | Días que faltan, chat con mensajes, cancelar con reembolso |
+| Deep Purple en el Movistar Arena | Pendiente de pago           | Pagar, y el plazo para pagar (24 horas)                    |
+| Stand up: Fede Simonetti         | Confirmada (es hoy)         | Que el organizador valide la entrada                       |
+| Un Poyo Rojo                     | Reembolsada                 | Historial de estados                                       |
+| Encuentro de Telecomunicaciones  | Cancelada                   | Compra cancelada sin pagar                                 |
+| Ekoparty 2026                    | Utilizada, ya reseñada      | Ver una reseña hecha                                       |
+| Nerdearla Argentina 2026         | Utilizada, sin reseñar      | Dejar una reseña                                           |
 
 Cualquier usuario puede comprar y también publicar eventos.
 
@@ -107,22 +107,22 @@ Cualquier usuario puede comprar y también publicar eventos.
 
 **Como compradora** (`comprador@aiticketit.com`):
 
-- [ ] **Buscar y explorar**: en **Explorar**, buscá "musica" (sin tilde), filtrá por una categoría y ordená por Fecha, Precio y Puntaje (con la flecha cambiás el sentido).
+- [ ] **Buscar y explorar**: en **Explorar**, buscá "biónica" o "conferencia", filtrá por una categoría y ordená por Fecha, Precio y Puntaje (con la flecha cambiás el sentido).
 - [ ] **Reseñas del organizador**: entrá a un evento de Martín y bajá hasta sus reseñas.
-- [ ] **Comprar sin superar el cupo**: en **Rock en el Galpón** elegí **VIP**. Quedan 2, así que el botón `+` no deja pasar de 2. En otros tipos el tope es 10 por compra.
+- [ ] **Comprar sin superar el cupo**: en **Deep Purple en el Movistar Arena** elegí **VIP**. Quedan 2, así que el botón `+` no deja pasar de 2. En otros tipos el tope es 10 por compra.
 - [ ] **Favoritos**: tocá el ♡ arriba a la derecha de un evento y fijate que aparezca en **Perfil**.
 - [ ] **Mis compras**: revisá los colores de cada estado, filtrá por estado y fijate en "Faltan N días" de las confirmadas.
-- [ ] **Pagar**: abrí la compra pendiente de Rock, fijate hasta cuándo se puede pagar y tocá **Pagar**. Pasa a Confirmada y aparece "Faltan N días".
-- [ ] **Chat**: en la compra de Jazz, tocá **Chatear con el organizador** y mandá un mensaje.
-- [ ] **Cancelar con reembolso**: en la compra de Jazz, tocá **Cancelar y pedir reembolso**. Queda Reembolsada y en el historial aparecen los dos pasos.
-- [ ] **Reseñar**: en **Monólogos del Sur** elegí las estrellas, escribí un comentario y publicá.
-- [ ] **No se puede cancelar una utilizada**: en Tango o Monólogos no aparece el botón de cancelar.
+- [ ] **Pagar**: abrí la compra pendiente de Deep Purple, fijate hasta cuándo se puede pagar y tocá **Pagar**. Pasa a Confirmada y aparece "Faltan N días".
+- [ ] **Chat**: en la compra de Tan Biónica, tocá **Chatear con el organizador** y mandá un mensaje.
+- [ ] **Cancelar con reembolso**: en la compra de Tan Biónica, tocá **Cancelar y pedir reembolso**. Queda Reembolsada y en el historial aparecen los dos pasos.
+- [ ] **Reseñar**: en **Nerdearla Argentina 2026** elegí las estrellas, escribí un comentario y publicá.
+- [ ] **No se puede cancelar una utilizada**: en Ekoparty o Nerdearla no aparece el botón de cancelar.
 
 **Como organizador** (`organizador@aiticketit.com`; antes, **Perfil → Cerrar sesión**):
 
-- [ ] **Compras de un evento**: en **Mis eventos** tocá **Stand up: Risas de Viernes**. Vas a ver las compras por estado y cuántas entradas quedan de cada tipo.
+- [ ] **Compras de un evento**: en **Mis eventos** tocá **Stand up: Fede Simonetti**. Vas a ver las compras por estado y cuántas entradas quedan de cada tipo.
 - [ ] **Validar una entrada**: abrí la compra de Lucía del Stand up y tocá **Validar entrada**. Queda Utilizada.
-- [ ] **Responder el chat**: en **Mis eventos → Noche de Jazz**, abrí la compra de Lucía, entrá al chat y respondé.
+- [ ] **Responder el chat**: en **Mis eventos → Tan Biónica en el Movistar Arena**, abrí la compra de Lucía, entrá al chat y respondé.
 - [ ] **Crear un evento**: en **Mis eventos** tocá **+ Crear**. Completá nombre, descripción, categoría, una fecha futura (`AAAA-MM-DD`), la hora y al menos dos tipos de entrada con precio y cupo. Después buscalo en **Explorar**.
 - [ ] **No podés comprar tu propio evento**: en el detalle de un evento tuyo no aparece la compra, sino "Ver compras del evento".
 

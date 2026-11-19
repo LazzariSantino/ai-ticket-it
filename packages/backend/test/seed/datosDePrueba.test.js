@@ -40,7 +40,7 @@ describe("Datos de prueba", () => {
       .set("Authorization", await login("comprador@aiticketit.com"));
 
     expect(eventos.body[0].organizador).toMatchObject({ nombre: "Martín", puntaje: 4.5, cantidadResenias: 2 });
-    expect(eventos.body.map((evento) => evento.nombre)).not.toContain("Tango bajo las estrellas");
+    expect(eventos.body.map((evento) => evento.nombre)).not.toContain("Ekoparty 2026");
   });
 
   it("el organizador puede validar hoy las entradas del stand up", async () => {

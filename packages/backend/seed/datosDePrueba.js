@@ -29,108 +29,120 @@ export async function cargarDatosDePrueba(
   const tomas = await usuario("Tomás", "Ibarra", "tomas@aiticketit.com");
 
   // --- Eventos ---
+  // Son eventos reales de Buenos Aires (2026 y 2027). Las fechas se acomodan alrededor del arranque del servidor
+  // para que la demo siempre tenga eventos próximos, uno hoy y otros ya realizados con reseñas.
   const evento = async (datos) => await eventoRepository.guardar(new Evento(datos));
 
-  const jazz = await evento({
-    nombre: "Noche de Jazz en San Telmo",
-    descripcion: "Un trío de jazz clásico y standards en el sótano más íntimo de San Telmo. Puertas 20:30.",
+  const tanBionica = await evento({
+    nombre: "Tan Biónica en el Movistar Arena",
+    descripcion: "La banda de Chano y Bambi repasa sus himnos de siempre y las canciones nuevas. Puertas 19:30.",
     categoria: await categoria("Recitales"),
     fecha: enDias(12),
-    multimedia: [imagen("jazz-san-telmo"), imagen("jazz-trio")],
+    multimedia: [imagen("tan-bionica-arena"), imagen("tan-bionica-luces")],
     organizador: martin,
     tiposEntrada: [
-      { nombre: "General", descripcion: "De pie", precio: 12000, cupo: 120 },
-      { nombre: "VIP", descripcion: "Mesa con consumición", precio: 25000, cupo: 20 },
+      { nombre: "Campo", descripcion: "De pie", precio: 65000, cupo: 120 },
+      { nombre: "Platea VIP", descripcion: "Ubicación numerada con vista central", precio: 120000, cupo: 20 },
     ],
   });
-  const rock = await evento({
-    nombre: "Rock en el Galpón",
-    descripcion: "Cuatro bandas del under porteño en una noche a puro rock and roll.",
+  const deepPurple = await evento({
+    nombre: "Deep Purple en el Movistar Arena",
+    descripcion: 'Los creadores de "Smoke on the Water" vuelven a Buenos Aires con un show de clásicos del hard rock.',
     categoria: await categoria("Recitales"),
-    fecha: enDias(30, 20),
-    multimedia: [imagen("rock-galpon")],
+    fecha: enDias(21, 21),
+    multimedia: [imagen("deep-purple-arena")],
     organizador: martin,
     tiposEntrada: [
-      { nombre: "Campo", descripcion: "Frente al escenario", precio: 18000, cupo: 500 },
-      { nombre: "Platea", descripcion: "Sector sentado", precio: 28000, cupo: 150 },
-      { nombre: "VIP", descripcion: "Palco con barra libre", precio: 45000, cupo: 3 },
+      { nombre: "Campo", descripcion: "Frente al escenario", precio: 85000, cupo: 500 },
+      { nombre: "Platea", descripcion: "Sector sentado", precio: 110000, cupo: 150 },
+      { nombre: "VIP", descripcion: "Palco con meet & greet", precio: 250000, cupo: 3 },
     ],
   });
   // Es hoy, un rato más tarde, para poder validar entradas en la demo
   const standUp = await evento({
-    nombre: "Stand up: Risas de Viernes",
-    descripcion: "Cinco comediantes, un micrófono y ninguna piedad.",
+    nombre: "Stand up: Fede Simonetti",
+    descripcion:
+      "El comediante presenta su unipersonal en la Terraza Teatro Bar de Paseo La Plaza (Av. Corrientes 1660).",
     categoria: await categoria("Stand up"),
     fecha: new Date(Math.min(ahora.getTime() + 2 * 60 * 60 * 1000, enDias(0, 23, 59).getTime())),
-    multimedia: [imagen("standup-risas")],
+    multimedia: [imagen("fede-simonetti-standup")],
     organizador: martin,
-    tiposEntrada: [{ nombre: "General", precio: 9000, cupo: 80 }],
+    tiposEntrada: [{ nombre: "General", precio: 25000, cupo: 80 }],
   });
-  const tango = await evento({
-    nombre: "Tango bajo las estrellas",
-    descripcion: "Orquesta típica y milonga al aire libre.",
-    categoria: await categoria("Recitales"),
-    fecha: enDias(-20),
-    multimedia: [imagen("tango-estrellas")],
+  const ekoparty = await evento({
+    nombre: "Ekoparty 2026",
+    descripcion:
+      "La conferencia de seguridad informática más antigua de Latinoamérica: charlas de hacking, CTF y talleres.",
+    categoria: await categoria("Conferencias"),
+    fecha: enDias(-20, 10),
+    multimedia: [imagen("ekoparty-hacking")],
     organizador: martin,
-    tiposEntrada: [{ nombre: "General", precio: 10000, cupo: 200 }],
+    tiposEntrada: [{ nombre: "General", descripcion: "Acceso a charlas y CTF", precio: 40000, cupo: 200 }],
   });
-  const hamlet = await evento({
-    nombre: "Hamlet",
-    descripcion: "El clásico de Shakespeare en una puesta moderna, con elenco de primer nivel.",
+  const unPoyoRojo = await evento({
+    nombre: "Un Poyo Rojo",
+    descripcion: "Teatro físico, danza y humor sin palabras en el Teatro Metropolitan, sobre la calle Corrientes.",
     categoria: await categoria("Teatro"),
     fecha: enDias(20, 20, 30),
-    multimedia: [imagen("hamlet-teatro")],
+    multimedia: [imagen("un-poyo-rojo-teatro")],
     organizador: carla,
     tiposEntrada: [
-      { nombre: "Platea", precio: 15000, cupo: 200 },
-      { nombre: "Pullman", precio: 9000, cupo: 100 },
+      { nombre: "Platea", precio: 38000, cupo: 200 },
+      { nombre: "Pullman", precio: 28000, cupo: 100 },
     ],
   });
-  const conferencia = await evento({
-    nombre: "IA en el desarrollo de software",
-    descripcion: "Charlas sobre cómo usar herramientas de inteligencia artificial para programar mejor.",
+  const encuentroTelecom = await evento({
+    nombre: "Encuentro Argentino de Telecomunicaciones, Electrónica y Computación",
+    descripcion:
+      "Jornada de FUNDETEC sobre redes, conectividad, ciberseguridad e inteligencia artificial, presencial y con transmisión en línea.",
     categoria: await categoria("Conferencias"),
-    fecha: enDias(7, 18),
-    multimedia: [imagen("conferencia-ia")],
+    fecha: enDias(14, 9),
+    multimedia: [imagen("encuentro-telecom-redes")],
     organizador: carla,
     tiposEntrada: [
       { nombre: "General", descripcion: "Acceso a las charlas", precio: 0, cupo: 300 },
-      { nombre: "Workshop", descripcion: "Charlas + taller práctico", precio: 20000, cupo: 25 },
+      {
+        nombre: "Presencial con certificado",
+        descripcion: "Charlas + certificado de asistencia",
+        precio: 15000,
+        cupo: 25,
+      },
     ],
   });
   await evento({
-    nombre: "Festival Río Sonoro",
-    descripcion: "Dos días de música a orillas del río con más de 20 artistas.",
+    nombre: "Lollapalooza Argentina 2027",
+    descripcion:
+      "Tres días en el Hipódromo de San Isidro con Travis Scott, Charli xcx, The Killers, TINI, David Guetta y más de 70 artistas.",
     categoria: await categoria("Festivales"),
-    fecha: enDias(60, 16),
-    multimedia: [imagen("festival-rio"), imagen("festival-escenario")],
+    fecha: enDias(113, 12),
+    multimedia: [imagen("lollapalooza-hipodromo"), imagen("lollapalooza-escenario")],
     organizador: carla,
     tiposEntrada: [
-      { nombre: "Abono 2 días", precio: 60000, cupo: 1000 },
-      { nombre: "Entrada por día", precio: 35000, cupo: 800 },
+      { nombre: "Abono 3 días", precio: 420000, cupo: 1000 },
+      { nombre: "Entrada por día", precio: 190000, cupo: 800 },
     ],
   });
   await evento({
-    nombre: "Final de la Liga de Básquet",
-    descripcion: "El partido decisivo de la temporada.",
+    nombre: "Final del Torneo Clausura 2026",
+    descripcion: "La final del fútbol argentino en el Estadio Único Diego Armando Maradona de La Plata.",
     categoria: await categoria("Deportes"),
-    fecha: enDias(15, 19),
-    multimedia: [imagen("basquet-final")],
+    fecha: enDias(23, 19),
+    multimedia: [imagen("final-clausura-estadio")],
     organizador: carla,
     tiposEntrada: [
-      { nombre: "Popular", precio: 8000, cupo: 2000 },
-      { nombre: "Platea", precio: 22000, cupo: 500 },
+      { nombre: "Popular", precio: 45000, cupo: 2000 },
+      { nombre: "Platea", precio: 90000, cupo: 500 },
     ],
   });
-  const monologos = await evento({
-    nombre: "Monólogos del Sur",
-    descripcion: "Humor patagónico en un formato íntimo.",
-    categoria: await categoria("Stand up"),
-    fecha: enDias(-40),
-    multimedia: [imagen("monologos-sur")],
+  const nerdearla = await evento({
+    nombre: "Nerdearla Argentina 2026",
+    descripcion:
+      "El evento de tecnología gratuito más grande de habla hispana, organizado por Sysarmy en Ciudad Cultural Konex: IA, open source y ciencia.",
+    categoria: await categoria("Conferencias"),
+    fecha: enDias(-40, 10),
+    multimedia: [imagen("nerdearla-konex")],
     organizador: carla,
-    tiposEntrada: [{ nombre: "General", precio: 7000, cupo: 60 }],
+    tiposEntrada: [{ nombre: "General", descripcion: "Entrada gratuita con inscripción", precio: 0, cupo: 60 }],
   });
 
   // --- Compras en todos los estados ---
@@ -140,31 +152,31 @@ export async function cargarDatosDePrueba(
     );
   const haceUnRato = enDias(-1, 10);
 
-  const jazzLucia = await comprar(lucia, jazz, 1, 2, haceUnRato);
-  jazzLucia.pagar(lucia, haceUnRato);
-  jazzLucia.enviarMensaje(lucia, "Hola! ¿Hay estacionamiento cerca del lugar?", haceUnRato);
-  jazzLucia.enviarMensaje(
+  const tanBionicaLucia = await comprar(lucia, tanBionica, 1, 2, haceUnRato);
+  tanBionicaLucia.pagar(lucia, haceUnRato);
+  tanBionicaLucia.enviarMensaje(lucia, "Hola! ¿Hay estacionamiento cerca del Movistar Arena?", haceUnRato);
+  tanBionicaLucia.enviarMensaje(
     martin,
-    "Hola Lucía, sí: hay un garage en la esquina con descuento mostrando la entrada.",
+    "Hola Lucía, sí: hay varios garages sobre Humboldt, pero te recomendamos llegar temprano.",
     haceUnRato,
   );
 
   // Pendiente de pago, hecha al arrancar el servidor: tiene todo el plazo para pagar por delante
-  await comprar(lucia, rock, 3, 1, ahora);
+  await comprar(lucia, deepPurple, 3, 1, ahora);
 
-  const hamletLucia = await comprar(lucia, hamlet, 1, 2, enDias(-3, 12));
-  hamletLucia.pagar(lucia, enDias(-3, 12));
-  hamletLucia.cancelar(lucia, enDias(-2, 9));
-  hamletLucia.enviarMensaje(lucia, "Tuve que cancelar por un viaje, ¿el reembolso es automático?", enDias(-2, 9));
+  const unPoyoRojoLucia = await comprar(lucia, unPoyoRojo, 1, 2, enDias(-3, 12));
+  unPoyoRojoLucia.pagar(lucia, enDias(-3, 12));
+  unPoyoRojoLucia.cancelar(lucia, enDias(-2, 9));
+  unPoyoRojoLucia.enviarMensaje(lucia, "Tuve que cancelar por un viaje, ¿el reembolso es automático?", enDias(-2, 9));
 
-  const conferenciaLucia = await comprar(lucia, conferencia, 2, 1, enDias(-2, 15));
-  conferenciaLucia.cancelar(lucia, enDias(-2, 16));
+  const encuentroLucia = await comprar(lucia, encuentroTelecom, 2, 1, enDias(-2, 15));
+  encuentroLucia.cancelar(lucia, enDias(-2, 16));
 
   const standUpLucia = await comprar(lucia, standUp, 1, 2, haceUnRato);
   standUpLucia.pagar(lucia, haceUnRato);
 
-  const jazzTomas = await comprar(tomas, jazz, 1, 4, haceUnRato);
-  jazzTomas.pagar(tomas, haceUnRato);
+  const tanBionicaTomas = await comprar(tomas, tanBionica, 1, 4, haceUnRato);
+  tanBionicaTomas.pagar(tomas, haceUnRato);
   const standUpTomas = await comprar(tomas, standUp, 1, 1, haceUnRato);
   standUpTomas.pagar(tomas, haceUnRato);
 
@@ -181,9 +193,19 @@ export async function cargarDatosDePrueba(
     return compra;
   };
 
-  await asistir(lucia, tango, 4, "Hermosa noche, aunque hacía bastante frío. La orquesta, impecable.");
-  await asistir(tomas, tango, 5, "Organización perfecta, empezó puntual y el sonido era muy bueno.");
-  await asistir(tomas, monologos, 3.5, "Divertido, pero la sala era chica y se escuchaba mal desde atrás.");
-  // Lucía fue a Monólogos del Sur y todavía no la reseñó: sirve para probar la reseña desde la app
-  await asistir(lucia, monologos);
+  await asistir(
+    lucia,
+    ekoparty,
+    4,
+    "Muy buenas charlas de hacking y el CTF estuvo genial, aunque las filas eran largas.",
+  );
+  await asistir(tomas, ekoparty, 5, "Organización perfecta, empezó puntual y los talleres valieron cada peso.");
+  await asistir(
+    tomas,
+    nerdearla,
+    3.5,
+    "Charlas de primer nivel sobre IA y open source, pero las salas se llenaban rápido.",
+  );
+  // Lucía fue a Nerdearla y todavía no la reseñó: sirve para probar la reseña desde la app
+  await asistir(lucia, nerdearla);
 }
