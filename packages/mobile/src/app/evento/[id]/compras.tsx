@@ -76,6 +76,7 @@ export default function ComprasDeEventoScreen() {
     <ThemedView style={styles.flex}>
       <Stack.Screen options={{ title: "Compras del evento" }} />
       <FlatList
+        contentInsetAdjustmentBehavior="automatic"
         data={compras}
         keyExtractor={(compra) => String(compra.id)}
         renderItem={({ item }) => <CompraCard compra={item} vista="organizador" />}

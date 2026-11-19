@@ -70,13 +70,11 @@ export default function ChatScreen() {
 
   return (
     <ThemedView style={styles.flex}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={100}
-      >
+      {/* La pantalla ocupa todo el alto (el header es translúcido), así que no hace falta corrimiento */}
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <FlatList
           ref={lista}
+          contentInsetAdjustmentBehavior="automatic"
           data={mensajes ?? []}
           keyExtractor={(mensaje, indice) => `${mensaje.enviado}-${indice}`}
           contentContainerStyle={styles.lista}

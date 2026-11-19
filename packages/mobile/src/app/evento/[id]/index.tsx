@@ -93,7 +93,7 @@ export default function EventoScreen() {
           ),
         }}
       />
-      <ScrollView contentContainerStyle={styles.contenido}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.contenido}>
         <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
           {evento.multimedia.map((url) => (
             <Image

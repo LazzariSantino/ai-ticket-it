@@ -82,7 +82,11 @@ export default function CrearEventoScreen() {
   return (
     <ThemedView style={styles.flex}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={styles.contenido}
+          keyboardShouldPersistTaps="handled"
+        >
           <CampoTexto etiqueta="Nombre" value={nombre} onChangeText={setNombre} placeholder="Noche de Jazz" />
           <CampoTexto
             etiqueta="Descripción"

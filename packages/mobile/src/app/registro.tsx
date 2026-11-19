@@ -32,7 +32,11 @@ export default function RegistroScreen() {
   return (
     <ThemedView style={styles.flex}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={styles.contenido}
+          keyboardShouldPersistTaps="handled"
+        >
           <ThemedText themeColor="textSecondary">
             Con una misma cuenta podés comprar entradas y también publicar tus propios eventos.
           </ThemedText>

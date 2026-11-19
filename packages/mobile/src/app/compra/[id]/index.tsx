@@ -64,6 +64,7 @@ export default function CompraScreen() {
     <ThemedView style={styles.flex}>
       <Stack.Screen options={{ title: `Compra #${compra.id}` }} />
       <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={styles.contenido}
         refreshControl={<RefreshControl refreshing={recargando} onRefresh={recargar} tintColor={theme.primario} />}
       >
