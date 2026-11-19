@@ -100,13 +100,6 @@ function Conversacion({ compra }: { compra: Compra }) {
             </ThemedText>
           )}
         </View>
-        {sinLeer > 0 && (
-          <View style={[styles.sinLeer, { backgroundColor: theme.peligro }]}>
-            <ThemedText type="smallBold" style={styles.sinLeerTexto}>
-              {sinLeer}
-            </ThemedText>
-          </View>
-        )}
       </Pressable>
     </Link>
   );
@@ -142,19 +135,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.two,
-  },
-  sinLeer: {
-    alignSelf: "center",
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    paddingHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sinLeerTexto: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    lineHeight: 16,
   },
 });
