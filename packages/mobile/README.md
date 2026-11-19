@@ -7,7 +7,7 @@ App en React Native con [Expo](https://expo.dev) (SDK 58) y Expo Router. Las ins
 ```
 src/
 ├── app/            # Rutas de Expo Router (cada archivo es una pantalla)
-│   ├── (tabs)/     # Pestañas: Explorar, Mis compras, Mis eventos, Perfil
+│   ├── (tabs)/     # Pestañas: Explorar, Mis compras, Mensajes, Mis eventos, Perfil
 │   ├── evento/     # Detalle del evento y compras del evento (organizador)
 │   ├── compra/     # Detalle de la compra y chat
 │   ├── crear-evento.tsx

@@ -6,6 +6,9 @@ export const comprar = (eventoId: number, tipoEntradaId: number, cantidad: numbe
 
 export const listarMisCompras = () => pedir<Compra[]>("/compras");
 
+// Las compras con chat (como comprador o como organizador), la de último mensaje más reciente primero
+export const listarChats = () => pedir<Compra[]>("/compras/chats");
+
 export const obtenerCompra = (id: number | string) => pedir<Compra>(`/compras/${id}`);
 
 export const listarComprasDeEvento = (eventoId: number | string, estado?: EstadoCompra) =>

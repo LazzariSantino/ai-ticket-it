@@ -69,6 +69,7 @@ export type Compra = {
   puedeCancelarse: boolean;
   puedeSerReseniada: boolean;
   cantidadMensajes: number;
+  ultimoMensaje: Mensaje | null;
   resenia: Resenia | null;
   historial: CambioEstadoCompra[];
 };
