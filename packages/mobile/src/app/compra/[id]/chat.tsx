@@ -1,4 +1,5 @@
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useHeaderHeight } from "expo-router/react-navigation";
 import { useCallback, useRef, useState } from "react";
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,6 +28,7 @@ export default function ChatScreen() {
   const [enviando, setEnviando] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
   const lista = useRef<FlatList>(null);
+  const altoHeader = useHeaderHeight();
   const cantidadActual = useRef(0);
   cantidadActual.current = mensajes?.length ?? 0;
 
@@ -72,12 +74,13 @@ export default function ChatScreen() {
     <ThemedView style={styles.flex}>
       {/* La pantalla ocupa todo el alto (el header es translúcido), así que no hace falta corrimiento */}
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        {/* En iOS el header translúcido tapa el principio de la lista. No sirve el ajuste automático porque
+            scrollToEnd nunca deja el desplazamiento por debajo de 0, y con pocos mensajes los esconde atrás del header */}
         <FlatList
           ref={lista}
-          contentInsetAdjustmentBehavior="automatic"
           data={mensajes ?? []}
           keyExtractor={(mensaje, indice) => `${mensaje.enviado}-${indice}`}
-          contentContainerStyle={styles.lista}
+          contentContainerStyle={[styles.lista, Platform.OS === "ios" && { paddingTop: altoHeader + Spacing.three }]}
           onContentSizeChange={() => lista.current?.scrollToEnd({ animated: false })}
           ListEmptyComponent={
             <Vacio titulo="Sin mensajes" detalle="Escribí tu consulta sobre el evento, el acceso o cambios de fecha." />
