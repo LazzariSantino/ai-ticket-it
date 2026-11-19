@@ -21,7 +21,7 @@ export default function PerfilScreen() {
 
   return (
     <PantallaTab titulo="Perfil">
-      <ScrollView contentContainerStyle={styles.contenido}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.contenido}>
         <ThemedView type="backgroundElement" style={[styles.tarjeta, { borderColor: theme.borde }]}>
           <View style={[styles.avatar, { backgroundColor: theme.primarioSuave }]}>
             <ThemedText type="subtitle" style={{ color: theme.primario }}>

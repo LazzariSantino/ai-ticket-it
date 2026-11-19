@@ -84,6 +84,7 @@ export default function ExplorarScreen() {
   return (
     <PantallaTab titulo="Explorar">
       <FlatList
+        contentInsetAdjustmentBehavior="automatic"
         data={eventos.datos ?? []}
         keyExtractor={(evento) => String(evento.id)}
         renderItem={({ item }) => <EventoCard evento={item} />}

@@ -23,6 +23,7 @@ export default function MisComprasScreen() {
   return (
     <PantallaTab titulo="Mis compras">
       <FlatList
+        contentInsetAdjustmentBehavior="automatic"
         data={compras}
         keyExtractor={(compra) => String(compra.id)}
         renderItem={({ item }) => <CompraCard compra={item} />}

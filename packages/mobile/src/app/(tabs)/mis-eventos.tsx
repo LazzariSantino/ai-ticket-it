@@ -22,6 +22,7 @@ export default function MisEventosScreen() {
       accion={<Boton titulo="+ Crear" onPress={() => router.push("/crear-evento")} style={styles.crear} />}
     >
       <FlatList
+        contentInsetAdjustmentBehavior="automatic"
         data={datos ?? []}
         keyExtractor={(evento) => String(evento.id)}
         renderItem={({ item }) => <EventoOrganizado evento={item} />}
