@@ -56,11 +56,12 @@ export async function cargarDatosDePrueba(
     descripcion: 'Los creadores de "Smoke on the Water" vuelven a Buenos Aires con un show de clásicos del hard rock.',
     categoria: await categoria("Recitales"),
     fecha: enDias(21, 21),
+    // Primero la foto con el músico al centro, que se ve bien con cualquier recorte
     multimedia: [
+      foto("e/e3/Deep_Purple_-_MN_Gredos_-_03.jpg/960px-Deep_Purple_-_MN_Gredos_-_03.jpg"),
       foto(
         "0/05/Deep_Purple_live_at_BTarena_in_Cluj-Napoca%2C_Transylvania%2C_Romania_%281_October%2C_2026%29.jpg/960px-Deep_Purple_live_at_BTarena_in_Cluj-Napoca%2C_Transylvania%2C_Romania_%281_October%2C_2026%29.jpg",
       ),
-      foto("e/e3/Deep_Purple_-_MN_Gredos_-_03.jpg/960px-Deep_Purple_-_MN_Gredos_-_03.jpg"),
     ],
     organizador: martin,
     tiposEntrada: [
@@ -133,11 +134,11 @@ export async function cargarDatosDePrueba(
       "Tres días en el Hipódromo de San Isidro con Travis Scott, Charli xcx, The Killers, TINI, David Guetta y más de 70 artistas.",
     categoria: await categoria("Festivales"),
     fecha: enDias(113, 12),
+    // El cartel con el logo bien centrado primero, después el arco de la entrada y el público de la edición argentina
     multimedia: [
-      foto(
-        "7/7e/Lollapalooza_Argentina%21_%2833655638331%29.jpg/960px-Lollapalooza_Argentina%21_%2833655638331%29.jpg",
-      ),
-      foto("7/73/Lollapalooza_Argentina_%2813913278803%29.jpg/960px-Lollapalooza_Argentina_%2813913278803%29.jpg"),
+      foto("3/3e/Lollapalooza_sign.jpg/960px-Lollapalooza_sign.jpg"),
+      "https://upload.wikimedia.org/wikipedia/commons/5/5b/Lollapalooza_Chile.jpg",
+      foto("2/2a/Lollapalooza_Argentina_2015.jpg/960px-Lollapalooza_Argentina_2015.jpg"),
     ],
     organizador: carla,
     tiposEntrada: [
