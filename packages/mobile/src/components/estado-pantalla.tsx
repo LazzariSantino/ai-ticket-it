@@ -1,4 +1,4 @@
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import { Boton } from "@/components/boton";
 import { ThemedText } from "@/components/themed-text";
@@ -17,6 +17,7 @@ export function Cargando() {
 export function ErrorPantalla({ mensaje, onReintentar }: { mensaje: string; onReintentar?: () => void }) {
   return (
     <View style={styles.centro}>
+      <Ilustracion emoji="🎭" />
       <ThemedText type="subtitle">Algo salió mal</ThemedText>
       <ThemedText themeColor="textSecondary" style={styles.texto}>
         {mensaje}
@@ -26,9 +27,10 @@ export function ErrorPantalla({ mensaje, onReintentar }: { mensaje: string; onRe
   );
 }
 
-export function Vacio({ titulo, detalle }: { titulo: string; detalle?: string }) {
+export function Vacio({ titulo, detalle, emoji = "🎟️" }: { titulo: string; detalle?: string; emoji?: string }) {
   return (
     <View style={styles.centro}>
+      <Ilustracion emoji={emoji} />
       <ThemedText type="subtitle" style={styles.texto}>
         {titulo}
       </ThemedText>
@@ -41,15 +43,38 @@ export function Vacio({ titulo, detalle }: { titulo: string; detalle?: string })
   );
 }
 
+function Ilustracion({ emoji }: { emoji: string }) {
+  const theme = useTheme();
+  return (
+    <View style={[styles.ilustracion, { backgroundColor: theme.primarioSuave }]}>
+      <Text style={styles.emoji}>{emoji}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   centro: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: Spacing.three,
+    gap: Spacing.two + 4,
     padding: Spacing.four,
+    minHeight: 280,
   },
   texto: {
     textAlign: "center",
+    maxWidth: 320,
+  },
+  ilustracion: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: Spacing.one,
+  },
+  emoji: {
+    fontSize: 38,
+    lineHeight: 46,
   },
 });

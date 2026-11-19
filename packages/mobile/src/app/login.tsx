@@ -1,19 +1,18 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Boton } from "@/components/boton";
 import { CampoTexto } from "@/components/campo-texto";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
-import { useTheme } from "@/hooks/use-theme";
+import { Marquesina, Spacing, Tipografias } from "@/constants/theme";
 import { useSesion } from "@/sesion/sesion-context";
 
 export default function LoginScreen() {
   const { iniciarSesion } = useSesion();
-  const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,15 +31,22 @@ export default function LoginScreen() {
 
   return (
     <ThemedView style={styles.flex}>
-      <SafeAreaView style={styles.flex}>
-        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-          <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
-            <View style={styles.encabezado}>
-              <ThemedText style={[styles.logo, { color: theme.primario }]}>🎟️</ThemedText>
-              <ThemedText type="title">AI Ticket It</ThemedText>
-              <ThemedText themeColor="textSecondary">Descubrí eventos y comprá tus entradas</ThemedText>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <ScrollView
+          contentContainerStyle={[styles.contenido, { paddingBottom: insets.bottom + Spacing.four }]}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* La marquesina de la boletería, con la marca */}
+          <View style={[styles.marquesina, { paddingTop: insets.top + Spacing.five }]}>
+            <View style={styles.logo}>
+              <Text style={styles.logoEmoji}>🎟️</Text>
             </View>
+            <Text style={styles.marca}>AI Ticket It</Text>
+            <Text style={styles.lema}>Recitales, teatro, festivales y charlas.{"\n"}Tu próximo plan está acá.</Text>
+          </View>
 
+          <View style={styles.formulario}>
+            <ThemedText type="subtitle">Entrá a tu cuenta</ThemedText>
             <CampoTexto
               etiqueta="Email"
               value={email}
@@ -70,9 +76,9 @@ export default function LoginScreen() {
             <Link href="/registro" style={styles.centrado}>
               <ThemedText type="link">¿No tenés cuenta? Registrate</ThemedText>
             </Link>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ThemedView>
   );
 }
@@ -83,18 +89,48 @@ const styles = StyleSheet.create({
   },
   contenido: {
     flexGrow: 1,
-    justifyContent: "center",
-    padding: Spacing.four,
-    gap: Spacing.three,
   },
-  encabezado: {
+  marquesina: {
     alignItems: "center",
-    gap: Spacing.one,
-    marginBottom: Spacing.three,
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.five + 8,
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
+    backgroundImage: Marquesina,
   },
   logo: {
-    fontSize: 56,
-    lineHeight: 68,
+    width: 76,
+    height: 76,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.18)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.45)",
+    marginBottom: Spacing.two,
+  },
+  logoEmoji: {
+    fontSize: 38,
+    lineHeight: 46,
+  },
+  marca: {
+    color: "#FFFFFF",
+    fontFamily: Tipografias.titulo,
+    fontSize: 40,
+    lineHeight: 44,
+    letterSpacing: -1,
+  },
+  lema: {
+    color: "rgba(255, 255, 255, 0.88)",
+    fontSize: 16,
+    lineHeight: 23,
+    textAlign: "center",
+  },
+  formulario: {
+    flex: 1,
+    padding: Spacing.four,
+    gap: Spacing.three,
   },
   centrado: {
     alignSelf: "center",

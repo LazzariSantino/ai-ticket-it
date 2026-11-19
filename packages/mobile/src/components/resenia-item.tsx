@@ -1,35 +1,69 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import type { Resenia } from "@/api/tipos";
 import { Estrellas } from "@/components/estrellas";
 import { ThemedText } from "@/components/themed-text";
-import { Spacing } from "@/constants/theme";
+import { Marquesina, Spacing, Tipografias } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 
 export function ReseniaItem({ resenia }: { resenia: Resenia }) {
+  const theme = useTheme();
+  const { nombre, apellido } = resenia.comprador;
+
   return (
-    <View style={styles.resenia}>
+    <View style={[styles.resenia, { borderTopColor: theme.borde }]}>
       <View style={styles.encabezado}>
-        <ThemedText type="smallBold">
-          {resenia.comprador.nombre} {resenia.comprador.apellido[0]}.
-        </ThemedText>
+        <View style={styles.avatar}>
+          <Text style={styles.iniciales}>
+            {nombre[0]}
+            {apellido[0]}
+          </Text>
+        </View>
+        <View style={styles.flex}>
+          <ThemedText type="smallBold">
+            {nombre} {apellido[0]}.
+          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
+            Fue a {resenia.evento.nombre}
+          </ThemedText>
+        </View>
         <Estrellas puntaje={resenia.puntuacion} tamanio={14} />
       </View>
-      <ThemedText type="small" themeColor="textSecondary">
-        En «{resenia.evento.nombre}»
+      <ThemedText type="small" style={styles.texto}>
+        “{resenia.detalle}”
       </ThemedText>
-      <ThemedText type="small">{resenia.detalle}</ThemedText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   resenia: {
-    gap: Spacing.half,
-    paddingVertical: Spacing.two,
+    gap: Spacing.two,
+    paddingTop: Spacing.three,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   encabezado: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    gap: Spacing.two + 2,
+  },
+  flex: {
+    flex: 1,
+  },
+  avatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundImage: Marquesina,
+  },
+  iniciales: {
+    color: "#FFFFFF",
+    fontFamily: Tipografias.subtitulo,
+    fontSize: 14,
+  },
+  texto: {
+    lineHeight: 21,
   },
 });

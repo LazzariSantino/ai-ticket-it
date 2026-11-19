@@ -19,6 +19,7 @@ export function EstadoBadge({ estado, grande }: { estado: EstadoCompra; grande?:
   const colores = ColoresEstado[estado];
   return (
     <View style={[styles.badge, grande && styles.grande, { backgroundColor: colores.fondo }]}>
+      <View style={[styles.punto, { backgroundColor: colores.punto }]} />
       <Text style={[styles.texto, grande && styles.textoGrande, { color: colores.texto }]}>{TEXTOS[estado]}</Text>
     </View>
   );
@@ -27,13 +28,21 @@ export function EstadoBadge({ estado, grande }: { estado: EstadoCompra; grande?:
 const styles = StyleSheet.create({
   badge: {
     alignSelf: "flex-start",
-    paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.half,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: Spacing.two + 2,
+    paddingVertical: 3,
     borderRadius: 999,
   },
   grande: {
     paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one,
+    paddingVertical: Spacing.one + 2,
+  },
+  punto: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
   },
   texto: {
     fontSize: 12,

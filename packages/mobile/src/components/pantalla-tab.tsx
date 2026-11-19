@@ -6,13 +6,31 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Spacing } from "@/constants/theme";
 
-// Contenedor de las pantallas de las pestañas: las pestañas nativas no tienen header, así que lleva su título
-export function PantallaTab({ titulo, accion, children }: { titulo: string; accion?: ReactNode; children: ReactNode }) {
+// Contenedor de las pantallas de las pestañas: las pestañas nativas no tienen header, así que lleva su título.
+// `antetitulo` es la línea chica de color que va arriba (un saludo o el contexto de la pantalla).
+export function PantallaTab({
+  titulo,
+  antetitulo,
+  accion,
+  children,
+}: {
+  titulo: string;
+  antetitulo?: string;
+  accion?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <ThemedView style={styles.flex}>
       <SafeAreaView style={styles.flex} edges={["top", "left", "right"]}>
         <View style={styles.encabezado}>
-          <ThemedText type="title">{titulo}</ThemedText>
+          <View style={styles.textos}>
+            {antetitulo && (
+              <ThemedText type="etiqueta" themeColor="acento">
+                {antetitulo}
+              </ThemedText>
+            )}
+            <ThemedText type="title">{titulo}</ThemedText>
+          </View>
           {accion}
         </View>
         {children}
@@ -27,10 +45,15 @@ const styles = StyleSheet.create({
   },
   encabezado: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
-    paddingHorizontal: Spacing.three,
-    paddingTop: Spacing.two,
-    paddingBottom: Spacing.two,
+    gap: Spacing.three,
+    paddingHorizontal: Spacing.three + 4,
+    paddingTop: Spacing.three,
+    paddingBottom: Spacing.three,
+  },
+  textos: {
+    flex: 1,
+    gap: Spacing.one,
   },
 });

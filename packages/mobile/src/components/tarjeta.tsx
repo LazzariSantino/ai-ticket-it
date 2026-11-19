@@ -3,14 +3,21 @@ import { StyleSheet, type ViewStyle } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Radio, Spacing } from "@/constants/theme";
+import { RadioGrande, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
 export function Tarjeta({ titulo, children, style }: { titulo?: string; children: ReactNode; style?: ViewStyle }) {
   const theme = useTheme();
   return (
-    <ThemedView type="backgroundElement" style={[styles.tarjeta, { borderColor: theme.borde }, style]}>
-      {titulo && <ThemedText type="smallBold">{titulo}</ThemedText>}
+    <ThemedView
+      type="backgroundElement"
+      style={[styles.tarjeta, { borderColor: theme.borde, boxShadow: theme.sombra }, style]}
+    >
+      {titulo && (
+        <ThemedText type="etiqueta" themeColor="textSecondary">
+          {titulo}
+        </ThemedText>
+      )}
       {children}
     </ThemedView>
   );
@@ -18,9 +25,10 @@ export function Tarjeta({ titulo, children, style }: { titulo?: string; children
 
 const styles = StyleSheet.create({
   tarjeta: {
-    padding: Spacing.three,
-    borderRadius: Radio,
+    padding: Spacing.three + 2,
+    borderRadius: RadioGrande,
     borderWidth: 1,
-    gap: Spacing.two,
+    borderCurve: "continuous",
+    gap: Spacing.two + 4,
   },
 });

@@ -16,6 +16,19 @@ export function formatearFecha(fechaIso: string) {
   return `${dia} · ${hora}`;
 }
 
+const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);
+
+// Las partes de la fecha por separado, para el bloque de calendario de las tarjetas: { dia: "10", mes: "dic", hora: "21:00" }
+export function partesDeFecha(fechaIso: string) {
+  const fecha = new Date(fechaIso);
+  return {
+    dia: String(fecha.getDate()),
+    mes: fecha.toLocaleDateString("es-AR", { month: "short" }).replace(".", ""),
+    diaSemana: capitalizar(fecha.toLocaleDateString("es-AR", { weekday: "long" })),
+    hora: fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false }),
+  };
+}
+
 // "10/12/2026 21:00"
 export function formatearFechaHora(fechaIso: string) {
   const fecha = new Date(fechaIso);

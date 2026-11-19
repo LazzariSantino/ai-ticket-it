@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
@@ -13,11 +14,11 @@ import { ReseniaItem } from "@/components/resenia-item";
 import { Tarjeta } from "@/components/tarjeta";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Radio, Spacing } from "@/constants/theme";
+import { Radio, Spacing, Tipografias, VeloFoto } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { useSesion } from "@/sesion/sesion-context";
-import { formatearFecha, formatearPrecio } from "@/utils/formato";
+import { formatearPrecio, partesDeFecha } from "@/utils/formato";
 
 // El mismo tope que valida el backend (MAXIMO_ENTRADAS_POR_COMPRA)
 const MAXIMO_POR_COMPRA = 10;
@@ -37,6 +38,7 @@ export default function EventoScreen() {
   const [errorCompra, setErrorCompra] = useState<string | null>(null);
   const [guardandoFavorito, setGuardandoFavorito] = useState(false);
   const [errorFavorito, setErrorFavorito] = useState<string | null>(null);
+  const [foto, setFoto] = useState(0);
 
   if (cargando) return <Cargando />;
   if (error || !evento) return <ErrorPantalla mensaje={error ?? "No se encontró el evento"} onReintentar={recargar} />;
@@ -45,6 +47,7 @@ export default function EventoScreen() {
   const tipoElegido = evento.tiposEntrada.find((tipo) => tipo.id === tipoElegidoId && tipo.cupoDisponible > 0) ?? null;
   const maximo = Math.min(tipoElegido?.cupoDisponible ?? 0, MAXIMO_POR_COMPRA);
   const cantidad = Math.max(1, Math.min(cantidadElegida, maximo));
+  const fecha = partesDeFecha(evento.fecha);
 
   function elegirTipo(tipo: TipoEntrada) {
     setTipoElegidoId(tipo.id);
@@ -85,42 +88,76 @@ export default function EventoScreen() {
     <ThemedView style={styles.flex}>
       <Stack.Screen
         options={{
-          title: evento.nombre,
+          title: "",
+          headerTransparent: true,
+          headerTintColor: "#FFFFFF",
           headerRight: () => (
-            <Pressable onPress={alternarFavorito} hitSlop={10} accessibilityLabel="Favorito">
-              <Text style={[styles.corazon, { color: theme.peligro }]}>{evento.esFavorito ? "♥" : "♡"}</Text>
+            <Pressable
+              onPress={alternarFavorito}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel={evento.esFavorito ? "Quitar de favoritos" : "Guardar en favoritos"}
+              style={styles.favorito}
+            >
+              <Text style={[styles.corazon, { color: evento.esFavorito ? theme.acento : "#FFFFFF" }]}>
+                {evento.esFavorito ? "♥" : "♡"}
+              </Text>
             </Pressable>
           ),
         }}
       />
-      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.contenido}>
-        <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
-          {evento.multimedia.map((url) => (
-            <Image
-              key={url}
-              source={url}
-              style={[styles.imagen, { width, backgroundColor: theme.primarioSuave }]}
-              contentFit="cover"
-            />
-          ))}
-        </ScrollView>
+      {/* La foto queda detrás de la barra de estado, así que el texto de la barra va en blanco */}
+      <StatusBar style="light" />
+      <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.contenido}>
+        <View>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={(e) => setFoto(Math.round(e.nativeEvent.contentOffset.x / width))}
+          >
+            {evento.multimedia.map((url) => (
+              <Image
+                key={url}
+                source={url}
+                style={[styles.imagen, { width, backgroundColor: theme.primarioSuave }]}
+                contentFit="cover"
+                transition={250}
+              />
+            ))}
+          </ScrollView>
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.velo]}>
+            <View style={styles.categoria}>
+              <Text style={styles.categoriaTexto}>{evento.categoria.nombre}</Text>
+            </View>
+            <Text style={styles.nombre}>{evento.nombre}</Text>
+            {evento.multimedia.length > 1 && (
+              <View style={styles.puntos}>
+                {evento.multimedia.map((url, indice) => (
+                  <View key={url} style={[styles.punto, indice === foto && styles.puntoActivo]} />
+                ))}
+              </View>
+            )}
+          </View>
+        </View>
 
         <View style={styles.cuerpo}>
-          <ThemedText type="small" style={{ color: theme.primario }}>
-            {evento.categoria.nombre.toUpperCase()} · {formatearFecha(evento.fecha)}
-          </ThemedText>
-          <ThemedText type="title">{evento.nombre}</ThemedText>
-          {errorFavorito && (
-            <ThemedText type="small" themeColor="peligro">
-              {errorFavorito}
-            </ThemedText>
-          )}
-          <ThemedText>{evento.descripcion}</ThemedText>
-
-          <Tarjeta titulo="Organiza">
-            <View style={styles.organizador}>
-              <ThemedText>
-                {evento.organizador.nombre} {evento.organizador.apellido}
+          <View
+            style={[
+              styles.datos,
+              { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
+            ]}
+          >
+            <View style={[styles.calendario, { backgroundColor: theme.acentoSuave }]}>
+              <Text style={[styles.mes, { color: theme.acento }]}>{fecha.mes}</Text>
+              <Text style={[styles.dia, { color: theme.acento }]}>{fecha.dia}</Text>
+            </View>
+            <View style={styles.flex}>
+              <ThemedText type="smallBold">
+                {fecha.diaSemana} · {fecha.hora} h
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                Organiza {evento.organizador.nombre} {evento.organizador.apellido}
               </ThemedText>
               {evento.organizador.puntaje === null ? (
                 <ThemedText type="small" themeColor="textSecondary">
@@ -128,14 +165,21 @@ export default function EventoScreen() {
                 </ThemedText>
               ) : (
                 <View style={styles.puntaje}>
-                  <Estrellas puntaje={evento.organizador.puntaje} />
+                  <Estrellas puntaje={evento.organizador.puntaje} tamanio={14} />
                   <ThemedText type="small" themeColor="textSecondary">
-                    {evento.organizador.puntaje.toFixed(1)} ({evento.organizador.cantidadResenias})
+                    {evento.organizador.puntaje.toFixed(1)} · {evento.organizador.cantidadResenias} reseñas
                   </ThemedText>
                 </View>
               )}
             </View>
-          </Tarjeta>
+          </View>
+
+          {errorFavorito && (
+            <ThemedText type="small" themeColor="peligro">
+              {errorFavorito}
+            </ThemedText>
+          )}
+          <ThemedText style={styles.descripcion}>{evento.descripcion}</ThemedText>
 
           {evento.esOrganizador ? (
             <Tarjeta titulo="Es tu evento">
@@ -154,12 +198,17 @@ export default function EventoScreen() {
                     key={tipo.id}
                     disabled={agotado}
                     onPress={() => elegirTipo(tipo)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: elegido, disabled: agotado }}
                     style={[
                       styles.tipo,
                       { borderColor: elegido ? theme.primario : theme.borde, opacity: agotado ? 0.5 : 1 },
                       elegido && { backgroundColor: theme.primarioSuave },
                     ]}
                   >
+                    <View style={[styles.radio, { borderColor: elegido ? theme.primario : theme.borde }]}>
+                      {elegido && <View style={[styles.radioPunto, { backgroundColor: theme.primario }]} />}
+                    </View>
                     <View style={styles.flex}>
                       <ThemedText type="smallBold">{tipo.nombre}</ThemedText>
                       {tipo.descripcion ? (
@@ -171,7 +220,7 @@ export default function EventoScreen() {
                         {agotado ? "Agotado" : `Quedan ${tipo.cupoDisponible}`}
                       </ThemedText>
                     </View>
-                    <ThemedText type="subtitle">{formatearPrecio(tipo.precio)}</ThemedText>
+                    <ThemedText type="numero">{formatearPrecio(tipo.precio)}</ThemedText>
                   </Pressable>
                 );
               })}
@@ -188,7 +237,9 @@ export default function EventoScreen() {
                         deshabilitado={cantidad <= 1}
                         onPress={() => setCantidad(cantidad - 1)}
                       />
-                      <ThemedText type="subtitle">{cantidad}</ThemedText>
+                      <ThemedText type="numero" style={styles.numeroCantidad}>
+                        {cantidad}
+                      </ThemedText>
                       <Boton
                         titulo="+"
                         variante="secundario"
@@ -200,7 +251,9 @@ export default function EventoScreen() {
                   </View>
                   <View style={styles.cantidad}>
                     <ThemedText type="smallBold">Total</ThemedText>
-                    <ThemedText type="subtitle">{formatearPrecio(tipoElegido.precio * cantidad)}</ThemedText>
+                    <ThemedText type="title" themeColor="primario" style={styles.total}>
+                      {formatearPrecio(tipoElegido.precio * cantidad)}
+                    </ThemedText>
                   </View>
                 </>
               )}
@@ -241,18 +294,100 @@ const styles = StyleSheet.create({
   contenido: {
     paddingBottom: Spacing.six,
   },
+  // Apaisada: casi todas las fotos son horizontales y así se ven enteras, con logos y escenarios incluidos
   imagen: {
-    aspectRatio: 16 / 9,
+    aspectRatio: 5 / 4,
+  },
+  velo: {
+    justifyContent: "flex-end",
+    gap: Spacing.two,
+    padding: Spacing.four - 4,
+    paddingBottom: Spacing.five + Spacing.two,
+    backgroundImage: VeloFoto,
+  },
+  categoria: {
+    alignSelf: "flex-start",
+    paddingHorizontal: Spacing.two + 4,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: "rgba(16, 13, 24, 0.55)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+  },
+  categoriaTexto: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 0.4,
+  },
+  nombre: {
+    color: "#FFFFFF",
+    fontFamily: Tipografias.titulo,
+    fontSize: 34,
+    lineHeight: 38,
+    letterSpacing: -0.8,
+  },
+  puntos: {
+    flexDirection: "row",
+    gap: 6,
+    marginTop: Spacing.one,
+  },
+  punto: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  },
+  puntoActivo: {
+    width: 18,
+    backgroundColor: "#FFFFFF",
   },
   cuerpo: {
-    padding: Spacing.three,
+    padding: Spacing.three + 4,
+    marginTop: -Spacing.five,
+    gap: Spacing.three + 4,
+  },
+  datos: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.three,
+    padding: Spacing.three,
+    borderRadius: 24,
+    borderCurve: "continuous",
+    borderWidth: 1,
+  },
+  calendario: {
+    width: 60,
+    paddingVertical: Spacing.two,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  mes: {
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  dia: {
+    fontFamily: Tipografias.titulo,
+    fontSize: 28,
+    lineHeight: 30,
+  },
+  descripcion: {
+    fontSize: 16,
+    lineHeight: 25,
+  },
+  favorito: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(16, 13, 24, 0.45)",
   },
   corazon: {
-    fontSize: 26,
-  },
-  organizador: {
-    gap: Spacing.one,
+    fontSize: 20,
+    lineHeight: 24,
   },
   puntaje: {
     flexDirection: "row",
@@ -262,10 +397,24 @@ const styles = StyleSheet.create({
   tipo: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.two,
+    gap: Spacing.three,
     padding: Spacing.three,
     borderRadius: Radio,
-    borderWidth: 1,
+    borderCurve: "continuous",
+    borderWidth: 1.5,
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioPunto: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   cantidad: {
     flexDirection: "row",
@@ -278,7 +427,17 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   botonCantidad: {
-    minHeight: 40,
-    width: 44,
+    minHeight: 42,
+    width: 42,
+    paddingHorizontal: 0,
+    borderRadius: 21,
+  },
+  numeroCantidad: {
+    minWidth: 24,
+    textAlign: "center",
+  },
+  total: {
+    fontSize: 26,
+    lineHeight: 30,
   },
 });

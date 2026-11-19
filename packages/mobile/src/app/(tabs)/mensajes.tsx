@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { Link, useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from "react-native";
 
@@ -8,7 +8,7 @@ import type { Compra } from "@/api/tipos";
 import { Cargando, ErrorPantalla, Vacio } from "@/components/estado-pantalla";
 import { PantallaTab } from "@/components/pantalla-tab";
 import { ThemedText } from "@/components/themed-text";
-import { Radio, Spacing } from "@/constants/theme";
+import { RadioGrande, Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { useUsuario } from "@/sesion/sesion-context";
@@ -30,7 +30,7 @@ export default function MensajesScreen() {
   );
 
   return (
-    <PantallaTab titulo="Mensajes">
+    <PantallaTab antetitulo="Conversaciones" titulo="Mensajes">
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={datos ?? []}
@@ -65,43 +65,44 @@ function Conversacion({ compra }: { compra: Compra }) {
   const sinLeer = compra.mensajesSinLeer ?? 0;
 
   return (
-    <Link href={`/compra/${compra.id}/chat`} asChild>
-      <Pressable
-        accessibilityLabel={`Chat con ${otro.nombre} ${otro.apellido} sobre ${compra.evento.nombre}${
-          sinLeer > 0 ? `, ${sinLeer} sin leer` : ""
-        }`}
-        style={({ pressed }) => [
-          styles.fila,
-          { backgroundColor: theme.backgroundElement, borderColor: theme.borde, opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <Image
-          source={compra.evento.multimedia[0]}
-          style={[styles.imagen, { backgroundColor: theme.primarioSuave }]}
-          contentFit="cover"
-        />
-        <View style={styles.cuerpo}>
-          <View style={styles.encabezado}>
-            <ThemedText type="smallBold" numberOfLines={1} style={styles.flex}>
-              {otro.nombre} {otro.apellido}
-            </ThemedText>
-            {ultimo && (
-              <ThemedText type="small" themeColor="textSecondary">
-                {formatearFechaHora(ultimo.enviado)}
-              </ThemedText>
-            )}
-          </View>
-          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {soyComprador ? "Organizador" : "Comprador"} · {compra.evento.nombre}
+    <Pressable
+      accessibilityRole="link"
+      accessibilityLabel={`Chat con ${otro.nombre} ${otro.apellido} sobre ${compra.evento.nombre}${
+        sinLeer > 0 ? `, ${sinLeer} sin leer` : ""
+      }`}
+      onPress={() => router.push(`/compra/${compra.id}/chat`)}
+      style={({ pressed }) => [
+        styles.fila,
+        { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
+        { transform: [{ scale: pressed ? 0.98 : 1 }] },
+      ]}
+    >
+      <Image
+        source={compra.evento.multimedia[0]}
+        style={[styles.imagen, { backgroundColor: theme.primarioSuave }]}
+        contentFit="cover"
+      />
+      <View style={styles.cuerpo}>
+        <View style={styles.encabezado}>
+          <ThemedText type="smallBold" numberOfLines={1} style={styles.flex}>
+            {otro.nombre} {otro.apellido}
           </ThemedText>
           {ultimo && (
-            <ThemedText type={sinLeer > 0 ? "smallBold" : "small"} numberOfLines={2}>
-              {autor}: {ultimo.mensaje}
+            <ThemedText type="small" themeColor="textSecondary">
+              {formatearFechaHora(ultimo.enviado)}
             </ThemedText>
           )}
         </View>
-      </Pressable>
-    </Link>
+        <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
+          {soyComprador ? "Organizador" : "Comprador"} · {compra.evento.nombre}
+        </ThemedText>
+        {ultimo && (
+          <ThemedText type={sinLeer > 0 ? "smallBold" : "small"} numberOfLines={2}>
+            {autor}: {ultimo.mensaje}
+          </ThemedText>
+        )}
+      </View>
+    </Pressable>
   );
 }
 
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   lista: {
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.three + 4,
     paddingBottom: Spacing.five,
     gap: Spacing.two,
   },
@@ -119,13 +120,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Spacing.three,
     padding: Spacing.three,
-    borderRadius: Radio,
+    borderRadius: RadioGrande,
+    borderCurve: "continuous",
     borderWidth: 1,
   },
   imagen: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
   },
   cuerpo: {
     flex: 1,

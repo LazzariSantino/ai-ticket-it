@@ -13,6 +13,7 @@ import { Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useDemorado } from "@/hooks/use-demorado";
 import { useTheme } from "@/hooks/use-theme";
+import { useUsuario } from "@/sesion/sesion-context";
 
 const ORDENES: { valor: OrdenEventos; texto: string; direccionPorDefecto: "asc" | "desc" }[] = [
   { valor: "fecha", texto: "Fecha", direccionPorDefecto: "asc" },
@@ -22,6 +23,7 @@ const ORDENES: { valor: OrdenEventos; texto: string; direccionPorDefecto: "asc" 
 
 export default function ExplorarScreen() {
   const theme = useTheme();
+  const usuario = useUsuario();
   const [texto, setTexto] = useState("");
   const [categoriaId, setCategoriaId] = useState<number | undefined>();
   const [orden, setOrden] = useState<OrdenEventos>("fecha");
@@ -44,7 +46,7 @@ export default function ExplorarScreen() {
       <CampoTexto
         value={texto}
         onChangeText={setTexto}
-        placeholder="Buscar recitales, obras, artistas..."
+        placeholder="🔍  Buscá recitales, obras, charlas..."
         returnKeyType="search"
         clearButtonMode="while-editing"
         autoCorrect={false}
@@ -61,8 +63,8 @@ export default function ExplorarScreen() {
         ))}
       </ScrollView>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fila}>
-        <ThemedText type="small" themeColor="textSecondary" style={styles.etiqueta}>
-          Ordenar por
+        <ThemedText type="etiqueta" themeColor="textSecondary" style={styles.etiqueta}>
+          Ordenar
         </ThemedText>
         {ORDENES.map((opcion) => (
           <Chip
@@ -82,7 +84,7 @@ export default function ExplorarScreen() {
   );
 
   return (
-    <PantallaTab titulo="Explorar">
+    <PantallaTab antetitulo={`Hola, ${usuario.nombre} 👋`} titulo="Tu próximo plan">
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={eventos.datos ?? []}
@@ -111,12 +113,12 @@ export default function ExplorarScreen() {
 
 const styles = StyleSheet.create({
   lista: {
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.three + 4,
     paddingBottom: Spacing.five,
-    gap: Spacing.three,
+    gap: Spacing.four - 4,
   },
   filtros: {
-    gap: Spacing.two,
+    gap: Spacing.two + 4,
     marginBottom: Spacing.one,
   },
   fila: {

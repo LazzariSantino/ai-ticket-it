@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from "react-native";
 
 import { listarMisEventos } from "@/api/eventos";
@@ -7,7 +7,7 @@ import { Boton } from "@/components/boton";
 import { Cargando, ErrorPantalla, Vacio } from "@/components/estado-pantalla";
 import { PantallaTab } from "@/components/pantalla-tab";
 import { ThemedText } from "@/components/themed-text";
-import { Radio, Spacing } from "@/constants/theme";
+import { Marquesina, RadioGrande, Spacing } from "@/constants/theme";
 import { useConsulta } from "@/hooks/use-consulta";
 import { useTheme } from "@/hooks/use-theme";
 import { formatearFecha } from "@/utils/formato";
@@ -18,6 +18,7 @@ export default function MisEventosScreen() {
 
   return (
     <PantallaTab
+      antetitulo="Panel del organizador"
       titulo="Mis eventos"
       accion={<Boton titulo="+ Crear" onPress={() => router.push("/crear-evento")} style={styles.crear} />}
     >
@@ -49,43 +50,49 @@ function EventoOrganizado({ evento }: { evento: Evento }) {
   const finalizado = new Date(evento.fecha) <= new Date();
 
   return (
-    <Link href={`/evento/${evento.id}/compras`} asChild>
-      <Pressable
-        style={({ pressed }) => [
-          styles.tarjeta,
-          { backgroundColor: theme.backgroundElement, borderColor: theme.borde, opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <View style={styles.encabezado}>
-          <ThemedText type="small" style={{ color: theme.primario }}>
-            {formatearFecha(evento.fecha)}
+    <Pressable
+      accessibilityRole="link"
+      onPress={() => router.push(`/evento/${evento.id}/compras`)}
+      style={({ pressed }) => [
+        styles.tarjeta,
+        { backgroundColor: theme.backgroundElement, borderColor: theme.borde, boxShadow: theme.sombra },
+        { transform: [{ scale: pressed ? 0.98 : 1 }] },
+      ]}
+    >
+      <View style={styles.encabezado}>
+        <ThemedText type="etiqueta" themeColor="acento">
+          {formatearFecha(evento.fecha)}
+        </ThemedText>
+        {finalizado && (
+          <ThemedText type="etiqueta" themeColor="textSecondary">
+            Finalizado
           </ThemedText>
-          {finalizado && (
-            <ThemedText type="smallBold" themeColor="textSecondary">
-              FINALIZADO
-            </ThemedText>
-          )}
-        </View>
-        <ThemedText type="subtitle">{evento.nombre}</ThemedText>
+        )}
+      </View>
+      <ThemedText type="subtitle">{evento.nombre}</ThemedText>
+      <View style={styles.encabezado}>
         <ThemedText type="small" themeColor="textSecondary">
           Vendidas {vendidas} de {cupoTotal} · Quedan {evento.entradasDisponibles}
         </ThemedText>
-        <View style={[styles.barra, { backgroundColor: theme.backgroundSelected }]}>
-          <View
-            style={[
-              styles.relleno,
-              { backgroundColor: theme.primario, width: `${cupoTotal ? (vendidas / cupoTotal) * 100 : 0}%` },
-            ]}
-          />
-        </View>
-      </Pressable>
-    </Link>
+        <ThemedText type="numero" themeColor="primario">
+          {cupoTotal ? Math.round((vendidas / cupoTotal) * 100) : 0}%
+        </ThemedText>
+      </View>
+      <View style={[styles.barra, { backgroundColor: theme.backgroundSelected }]}>
+        <View
+          style={[
+            styles.relleno,
+            { backgroundImage: Marquesina, width: `${cupoTotal ? Math.max((vendidas / cupoTotal) * 100, 2) : 0}%` },
+          ]}
+        />
+      </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   lista: {
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.three + 4,
     paddingBottom: Spacing.five,
     gap: Spacing.three,
   },
@@ -93,18 +100,20 @@ const styles = StyleSheet.create({
     minHeight: 38,
   },
   tarjeta: {
-    padding: Spacing.three,
-    borderRadius: Radio,
+    padding: Spacing.three + 2,
+    borderRadius: RadioGrande,
+    borderCurve: "continuous",
     borderWidth: 1,
-    gap: Spacing.one,
+    gap: Spacing.one + 2,
   },
   encabezado: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   barra: {
-    height: 6,
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
     overflow: "hidden",
     marginTop: Spacing.one,
   },
