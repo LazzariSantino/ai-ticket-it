@@ -186,12 +186,6 @@ export async function cargarDatosDePrueba(
 
   const tanBionicaLucia = await comprar(lucia, tanBionica, 1, 2, haceUnRato);
   tanBionicaLucia.pagar(lucia, haceUnRato);
-  tanBionicaLucia.enviarMensaje(lucia, "Hola! ¿Hay estacionamiento cerca del Movistar Arena?", haceUnRato);
-  tanBionicaLucia.enviarMensaje(
-    martin,
-    "Hola Lucía, sí: hay varios garages sobre Humboldt, pero te recomendamos llegar temprano.",
-    haceUnRato,
-  );
 
   // Pendiente de pago, hecha al arrancar el servidor: tiene todo el plazo para pagar por delante
   await comprar(lucia, deepPurple, 3, 1, ahora);
@@ -199,7 +193,6 @@ export async function cargarDatosDePrueba(
   const unPoyoRojoLucia = await comprar(lucia, unPoyoRojo, 1, 2, enDias(-3, 12));
   unPoyoRojoLucia.pagar(lucia, enDias(-3, 12));
   unPoyoRojoLucia.cancelar(lucia, enDias(-2, 9));
-  unPoyoRojoLucia.enviarMensaje(lucia, "Tuve que cancelar por un viaje, ¿el reembolso es automático?", enDias(-2, 9));
 
   const encuentroLucia = await comprar(lucia, encuentroTelecom, 2, 1, enDias(-2, 15));
   encuentroLucia.cancelar(lucia, enDias(-2, 16));
